@@ -2,6 +2,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/user.module';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AuthController } from './presentation/http/controllers/auth.controller';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './infrastructure/constants/auth/constants';
+import { UserRepository } from './domain/repositories/user.repository';
+import { TypeOrmUserRepository } from './infrastructure/database/typeorm/repositories/user.typeorm-repository';
+import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/user.typeorm-entity';
 
 @Module({
   imports: [
@@ -25,8 +33,24 @@ import { UserModule } from './modules/user.module';
       }),
     }),
     UserModule,
+    JwtModule.registerAsync({
+      global: true,
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: '7d',
+        },
+      }),
+    }),
+    TypeOrmModule.forFeature([UserTypeOrmEntity]),
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController, AuthController],
+  providers: [
+    AppService,
+    {
+      provide: UserRepository,
+      useClass: TypeOrmUserRepository,
+    },
+  ],
 })
 export class AppModule {}
