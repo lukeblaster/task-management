@@ -6,12 +6,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthController } from './presentation/http/controllers/auth.controller';
 import { JwtModule } from '@nestjs/jwt';
-import { jwtConstants } from './infrastructure/constants/auth/constants';
 import { UserRepository } from './domain/repositories/user.repository';
 import { TypeOrmUserRepository } from './infrastructure/database/typeorm/repositories/user.typeorm-repository';
 import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/user.typeorm-entity';
 import { UserService } from './domain/services/user.service';
 import { CreateUserUseCase } from './app/use-cases/users/create-user.use-case';
+import { LoginUseCase } from './app/use-cases/auth/login.use-case';
+import { AuthModule } from './modules/auth.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { CreateUserUseCase } from './app/use-cases/users/create-user.use-case';
       }),
     }),
     UserModule,
+    AuthModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -48,15 +50,7 @@ import { CreateUserUseCase } from './app/use-cases/users/create-user.use-case';
     }),
     TypeOrmModule.forFeature([UserTypeOrmEntity]),
   ],
-  controllers: [AppController, AuthController],
-  providers: [
-    AppService,
-    {
-      provide: UserRepository,
-      useClass: TypeOrmUserRepository,
-    },
-    UserService,
-    CreateUserUseCase,
-  ],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {}

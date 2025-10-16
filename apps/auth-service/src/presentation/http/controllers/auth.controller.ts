@@ -9,27 +9,19 @@ import { AuthHeadersDto } from '../dtos/auth/auth-headers.dto';
 import { UserRepository } from 'src/domain/repositories/user.repository';
 import { compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { LoginUseCase } from 'src/app/use-cases/auth/login.use-case';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly loginUseCase: LoginUseCase) {}
 
   @MessagePattern('auth')
   async signIn(@AuthHeaders() credentials: AuthHeadersDto) {
-    const user = await this.userRepository.findByEmail(credentials.email);
+    const { access_token } = await this.loginUseCase.execute({
+      email: credentials.email,
+      password: credentials.password,
+    });
 
-    if (!user) throw new ForbiddenException();
-
-    const isPasswordCorrect = compare(user?.password, credentials.password);
-
-    if (!isPasswordCorrect) throw new UnauthorizedException();
-
-    const payload = { sub: user.id, email: user.email };
-    const jwt = await this.jwtService.signAsync(payload);
-
-    return { jwt };
+    return { access_token };
   }
 }

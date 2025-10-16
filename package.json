@@ -13,6 +13,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.19.21",
     "@types/passport": "^1.0.16",
+    "@types/passport-jwt": "^4.0.1",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "turbo": "^2.5.8"
@@ -24,5 +25,9 @@
     "apps/api-gateway",
     "apps/auth-service",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@nestjs/passport": "^11.0.5",
+    "passport-jwt": "^4.0.1"
+  }
 }

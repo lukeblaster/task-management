@@ -29,7 +29,12 @@ export class AuthController {
       this.authClient.send('auth', credential),
     );
 
-    res.setHeader('auth', response.jwt);
+    res.cookie('auth', response.access_token, {
+      httpOnly: true,
+      secure: false,
+      path: '/',
+      sameSite: 'none',
+    });
 
     return { message: 'Login realizado com sucesso' };
   }
