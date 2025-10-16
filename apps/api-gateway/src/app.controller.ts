@@ -1,11 +1,14 @@
-import { Body, Controller, Get, Inject, Post } from '@nestjs/common';
-import { AppService } from './app.service';
 import {
-  ClientProxy,
-  ClientProxyFactory,
-  Transport,
-} from '@nestjs/microservices';
+  Controller,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Inject,
+  Post,
+} from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { SignInDto } from './presentation/http/dto/auth/sign-in';
 
 @Controller('')
 export class AppController {
@@ -13,8 +16,9 @@ export class AppController {
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
   ) {}
 
-  @Post('signin')
-  async signIn(@Body() credential: { username: string; password: string }) {
+  @HttpCode(HttpStatus.OK)
+  @Post('login')
+  async signIn(@Headers() credential: SignInDto) {
     return await firstValueFrom(this.authClient.send('auth', credential));
   }
 }
