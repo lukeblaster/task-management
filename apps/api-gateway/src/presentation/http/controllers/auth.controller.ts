@@ -3,6 +3,7 @@ import {
   Controller,
   Headers,
   HttpCode,
+  HttpException,
   HttpStatus,
   Inject,
   Post,
@@ -26,8 +27,12 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const response = await firstValueFrom(
-      this.authClient.send('auth', credential),
+      this.authClient.send('auth.login', credential),
     );
+
+    if (!response.access_token) {
+      throw new HttpException(response.error, HttpStatus.UNAUTHORIZED);
+    }
 
     res.cookie('auth', response.access_token, {
       httpOnly: true,
@@ -36,7 +41,7 @@ export class AuthController {
       sameSite: 'none',
     });
 
-    return { message: 'Login realizado com sucesso' };
+    return { message: 'Login realizado com sucesso.' };
   }
 
   @HttpCode(HttpStatus.OK)
