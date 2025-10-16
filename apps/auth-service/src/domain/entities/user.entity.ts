@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 
 export interface UserProps {
-  name: string;
+  username: string;
   email: string;
   password: string;
   createdAt?: Date;
@@ -29,12 +29,12 @@ export class User {
     return this._id;
   }
 
-  get name(): string {
-    return this.props.name;
+  get username(): string {
+    return this.props.username;
   }
 
-  set name(value: string) {
-    this.props.name = value;
+  set username(value: string) {
+    this.props.username = value;
     this.props.updatedAt = new Date();
   }
 

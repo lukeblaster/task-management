@@ -21,6 +21,8 @@
   "packageManager": "npm@10.9.3",
   "workspaces": [
     "apps/*",
+    "apps/api-gateway",
+    "apps/auth-service",
     "packages/*"
   ]
 }

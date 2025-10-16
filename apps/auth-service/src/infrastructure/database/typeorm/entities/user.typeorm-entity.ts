@@ -12,7 +12,7 @@ export class UserTypeOrmEntity {
   id: string;
 
   @Column()
-  name: string;
+  username: string;
 
   @Column({ unique: true })
   email: string;

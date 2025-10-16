@@ -10,6 +10,8 @@ import { jwtConstants } from './infrastructure/constants/auth/constants';
 import { UserRepository } from './domain/repositories/user.repository';
 import { TypeOrmUserRepository } from './infrastructure/database/typeorm/repositories/user.typeorm-repository';
 import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/user.typeorm-entity';
+import { UserService } from './domain/services/user.service';
+import { CreateUserUseCase } from './app/use-cases/users/create-user.use-case';
 
 @Module({
   imports: [
@@ -34,11 +36,13 @@ import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/us
     }),
     UserModule,
     JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
       global: true,
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get('JWT_SECRET'),
         signOptions: {
-          expiresIn: '7d',
+          expiresIn: configService.get('JWT_EXPIRES_IN'),
         },
       }),
     }),
@@ -51,6 +55,8 @@ import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/us
       provide: UserRepository,
       useClass: TypeOrmUserRepository,
     },
+    UserService,
+    CreateUserUseCase,
   ],
 })
 export class AppModule {}

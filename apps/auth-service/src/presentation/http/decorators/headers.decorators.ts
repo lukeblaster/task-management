@@ -22,8 +22,6 @@ export const AuthHeaders = createParamDecorator(
       throw new BadRequestException('Invalid headers');
     }
 
-    console.log(authHeaders);
-
     return authHeaders;
   },
 );

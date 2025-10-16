@@ -47,7 +47,7 @@ export class TypeOrmUserRepository implements UserRepository {
   private toDomain(entity: UserTypeOrmEntity): User {
     return User.create(
       {
-        name: entity.name,
+        username: entity.username,
         email: entity.email,
         password: entity.password,
         createdAt: entity.createdAt,
@@ -60,7 +60,7 @@ export class TypeOrmUserRepository implements UserRepository {
   private toTypeOrmEntity(domain: User): UserTypeOrmEntity {
     const entity = new UserTypeOrmEntity();
     entity.id = domain.id;
-    entity.name = domain.name;
+    entity.username = domain.username;
     entity.email = domain.email;
     entity.password = domain.password;
     entity.createdAt = domain.createdAt;

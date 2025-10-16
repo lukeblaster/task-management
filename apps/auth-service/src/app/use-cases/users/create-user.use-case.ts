@@ -4,8 +4,10 @@ import { UserRepository } from '../../../domain/repositories/user.repository';
 import { User } from 'src/domain/entities/user.entity';
 import { UserService } from 'src/domain/services/user.service';
 
+import { hash, genSalt } from 'bcrypt';
+
 export interface CreateUserUseCaseRequest {
-  name: string;
+  username: string;
   email: string;
   password: string;
 }
@@ -22,7 +24,7 @@ export class CreateUserUseCase {
   ) {}
 
   async execute({
-    name,
+    username,
     email,
     password,
   }: CreateUserUseCaseRequest): Promise<CreateUserUseCaseResponse> {
@@ -32,7 +34,10 @@ export class CreateUserUseCase {
       throw new Error('Email already in use.');
     }
 
-    const user = User.create({ name, email, password });
+    const salt = await genSalt();
+    const hashPassword = await hash(password, salt);
+
+    const user = User.create({ username, email, password: hashPassword });
     await this.userRepository.create(user);
 
     return { user };
