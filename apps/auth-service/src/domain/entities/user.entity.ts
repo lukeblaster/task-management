@@ -4,6 +4,7 @@ export interface UserProps {
   username: string;
   email: string;
   password: string;
+  hashedRt?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -35,6 +36,15 @@ export class User {
 
   set username(value: string) {
     this.props.username = value;
+    this.props.updatedAt = new Date();
+  }
+
+  get hashedRt(): string {
+    return this.props.hashedRt || '';
+  }
+
+  set hashedRt(value: string) {
+    this.props.hashedRt = value;
     this.props.updatedAt = new Date();
   }
 

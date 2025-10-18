@@ -4,7 +4,8 @@ import { UserRepository } from '../../../domain/repositories/user.repository';
 import { User } from 'src/domain/entities/user.entity';
 import { UserService } from 'src/domain/services/user.service';
 
-import { hash, genSalt } from 'bcrypt';
+import * as argon from 'argon2';
+import { AuthService } from 'src/domain/services/auth.service';
 
 export interface CreateUserUseCaseRequest {
   username: string;
@@ -21,6 +22,7 @@ export class CreateUserUseCase {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {}
 
   async execute({
@@ -34,11 +36,16 @@ export class CreateUserUseCase {
       throw new Error('Email already in use.');
     }
 
-    const salt = await genSalt();
-    const hashPassword = await hash(password, salt);
+    const hashPassword = await argon.hash(password);
 
     const user = User.create({ username, email, password: hashPassword });
+
+    const tokens = await this.authService.getTokens(user.id, user.email);
+    user.hashedRt = await argon.hash(tokens.refresh_token);
+
     await this.userRepository.create(user);
+
+    console.log(user);
 
     return { user };
   }

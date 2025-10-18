@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { MicroserviceJwtAuthGuard } from 'src/domain/guards/microservice-jwt.guard';
-import { MicroserviceJwtStrategy } from 'src/domain/strategies/microservice-jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
+import { AtAuthGuard } from 'src/domain/guards/at.guard';
+import { AtJwtStrategy } from 'src/domain/strategies/at.strategy';
+import { RtStrategy } from 'src/domain/strategies/rt.strategy';
 import { AuthController } from 'src/presentation/http/controllers/auth.controller';
 import { TestController } from 'src/presentation/http/controllers/test.controller';
 
@@ -18,8 +20,9 @@ import { TestController } from 'src/presentation/http/controllers/test.controlle
         },
       },
     ]),
+    PassportModule,
   ],
   controllers: [AuthController, TestController],
-  providers: [MicroserviceJwtAuthGuard, MicroserviceJwtStrategy],
+  providers: [AtAuthGuard, AtJwtStrategy, RtStrategy],
 })
 export class AuthModule {}

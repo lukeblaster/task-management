@@ -7,7 +7,7 @@ export interface ValidateTokenUseCaseRequest {
 }
 
 export interface ValidateTokenUseCaseResponse {
-  response?: string;
+  payload?: string;
 }
 
 @Injectable()
@@ -18,14 +18,12 @@ export class ValidateTokenUseCase {
     token,
   }: ValidateTokenUseCaseRequest): Promise<ValidateTokenUseCaseResponse> {
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET,
-      });
+      const payload = await this.jwtService.verifyAsync(token);
 
       if (typeof payload !== 'object' || !payload.sub)
         throw new UnauthorizedException();
 
-      return { response: payload };
+      return payload;
     } catch (error) {
       return {};
     }

@@ -6,7 +6,8 @@ export interface DecodeTokenUseCaseRequest {
 }
 
 export interface DecodeTokenUseCaseResponse {
-  tokenDecoded?: string;
+  sub: string;
+  email: string;
 }
 
 @Injectable()
@@ -15,11 +16,11 @@ export class DecodeTokenUseCase {
 
   async execute({
     token,
-  }: DecodeTokenUseCaseRequest): Promise<DecodeTokenUseCaseResponse> {
+  }: DecodeTokenUseCaseRequest): Promise<DecodeTokenUseCaseResponse | null> {
     try {
       return await this.jwtService.decode(token);
     } catch (error) {
-      return {};
+      return null;
     }
   }
 }

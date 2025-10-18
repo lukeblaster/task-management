@@ -50,6 +50,7 @@ export class TypeOrmUserRepository implements UserRepository {
         username: entity.username,
         email: entity.email,
         password: entity.password,
+        hashedRt: entity.hashedRt,
         createdAt: entity.createdAt,
         updatedAt: entity.updatedAt,
       },
@@ -62,6 +63,7 @@ export class TypeOrmUserRepository implements UserRepository {
     entity.id = domain.id;
     entity.username = domain.username;
     entity.email = domain.email;
+    entity.hashedRt = domain.hashedRt;
     entity.password = domain.password;
     entity.createdAt = domain.createdAt;
     entity.updatedAt = domain.updatedAt;

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { UserRepository } from '../../../domain/repositories/user.repository';
 
-import { compare } from 'bcrypt';
+import * as argon from 'argon2';
 import { UserPresenter } from 'src/presentation/http/presenters/user.presenter';
 
 export interface ValidateUserUseCaseRequest {
@@ -29,7 +29,7 @@ export class ValidateUserUseCase {
 
     if (!user) throw new ForbiddenException();
 
-    const isPasswordCorrect = compare(user?.password, password);
+    const isPasswordCorrect = argon.verify(user?.password, password);
 
     if (!isPasswordCorrect) throw new UnauthorizedException();
 

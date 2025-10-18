@@ -17,8 +17,11 @@ export class UserTypeOrmEntity {
   @Column({ unique: true })
   email: string;
 
-  @Column({ name: 'password_hash' })
+  @Column({ name: 'password_hash', type: 'text' })
   password: string;
+
+  @Column({ type: 'text' })
+  hashedRt?: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
