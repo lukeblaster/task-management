@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Headers,
   HttpCode,
   HttpException,
@@ -8,6 +9,7 @@ import {
   Inject,
   Logger,
   Post,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -16,9 +18,8 @@ import { firstValueFrom } from 'rxjs';
 import type { Response } from 'express';
 import { SignInDto } from '../dto/auth/sign-in';
 import { RtAuthGuard } from 'src/domain/guards/rt.guard';
-import { RtStrategy } from 'src/domain/strategies/rt.strategy';
 
-@Controller('')
+@Controller('auth')
 export class AuthController {
   constructor(
     @Inject('AUTH_SERVICE') private readonly authClient: ClientProxy,
@@ -30,12 +31,9 @@ export class AuthController {
     @Headers() credential: SignInDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    console.log(credential);
     const response = await firstValueFrom(
       this.authClient.send('auth.login', credential),
     );
-
-    Logger.log(response);
 
     if (!response.access_token) {
       throw new HttpException(response.error, HttpStatus.UNAUTHORIZED);
@@ -64,11 +62,29 @@ export class AuthController {
     const response = await firstValueFrom(
       this.authClient.send('signup', credential),
     );
-    return { message: 'OK' };
+    return { message: 'Usuário criado com sucesso.' };
   }
 
   @UseGuards(RtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Post('refresh')
-  async refreshTokens(@Body() body: { refresh_token: string }) {}
+  @Get('refresh')
+  async refreshTokens(@Req() req, @Res({ passthrough: true }) res) {
+    res.cookie('access_token', req.user.access_token, {
+      httpOnly: true,
+      secure: false,
+      path: '/',
+      sameSite: 'none',
+    });
+
+    res.cookie('refresh_token', req.user.refresh_token, {
+      httpOnly: true,
+      secure: false,
+      path: '/',
+      sameSite: 'none',
+    });
+
+    Logger.debug('Tokens renovados com sucesso.');
+
+    return { message: 'Tokens renovados com sucesso.' };
+  }
 }

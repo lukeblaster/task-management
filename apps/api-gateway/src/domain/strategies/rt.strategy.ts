@@ -4,11 +4,12 @@ import {
   Inject,
   UnauthorizedException,
   Logger,
+  Req,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
 import { Strategy } from 'passport-custom';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 @Injectable()
 export class RtStrategy extends PassportStrategy(Strategy, 'rt-jwt') {
@@ -20,22 +21,14 @@ export class RtStrategy extends PassportStrategy(Strategy, 'rt-jwt') {
     super();
   }
 
-  async validate(request: Request): Promise<any> {
-    const authHeader = request.headers.authorization;
+  async validate(@Req() request: Request): Promise<any> {
+    const token = request.cookies.refresh_token;
 
-    if (!authHeader) {
+    if (!token) {
       throw new UnauthorizedException('Refresh token não fornecido');
     }
 
-    if (!authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException(
-        'Formato do token inválido. Use: Bearer <token>',
-      );
-    }
-
-    const refreshToken = authHeader.substring(7);
-
-    if (!refreshToken || refreshToken.trim().length === 0) {
+    if (!token || token.trim().length === 0) {
       throw new UnauthorizedException('Refresh token não pode estar vazio');
     }
 
@@ -44,17 +37,14 @@ export class RtStrategy extends PassportStrategy(Strategy, 'rt-jwt') {
         `📤 Enviando refresh token para validação no Auth Service...`,
       );
 
-      // ⚠️ IMPORTANTE: Envia para o Auth Service validar
       const response = await firstValueFrom(
         this.authClient
           .send('auth.refresh', {
-            token: refreshToken,
-            type: 'refresh', // Especifica que é refresh token
+            token: token,
+            type: 'refresh',
           })
           .pipe(timeout(5000)),
       );
-
-      console.log(response);
 
       this.logger.debug(
         `📥 Resposta do Auth Service: ${JSON.stringify(response)}`,

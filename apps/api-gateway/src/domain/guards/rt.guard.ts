@@ -23,7 +23,6 @@ export class RtAuthGuard extends AuthGuard('rt-jwt') {
   }
 
   handleRequest(err: any, payload: any, info: any, context: ExecutionContext) {
-    console.log(payload);
     if (err || !payload) {
       const request = context.switchToHttp().getRequest();
       this.logger.warn(

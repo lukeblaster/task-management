@@ -5,9 +5,11 @@ import {
   Inject,
   UnauthorizedException,
   Logger,
+  Req,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout } from 'rxjs';
+import type { Request } from 'express';
 
 @Injectable()
 export class AtJwtStrategy extends PassportStrategy(Strategy, 'at-jwt') {
@@ -19,20 +21,12 @@ export class AtJwtStrategy extends PassportStrategy(Strategy, 'at-jwt') {
     super();
   }
 
-  async validate(request: any): Promise<any> {
-    const authHeader = request.headers.authorization;
+  async validate(@Req() request: Request): Promise<any> {
+    const token = request.cookies.access_token;
 
-    if (!authHeader) {
+    if (!token) {
       throw new UnauthorizedException('Token de autorização não fornecido');
     }
-
-    if (!authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException(
-        'Formato do token inválido. Use: Bearer <token>',
-      );
-    }
-
-    const token = authHeader.substring(7);
 
     if (!token || token.trim().length === 0) {
       throw new UnauthorizedException('Token não pode estar vazio');

@@ -1,6 +1,7 @@
 import {
   ForbiddenException,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from '../../../domain/repositories/user.repository';
@@ -31,55 +32,44 @@ export class LoginUseCase {
     email,
     password,
   }: LoginUseCaseRequest): Promise<LoginUseCaseResponse> {
-    console.log(`🔐 Attempting login for email: ${email}`);
+    Logger.debug(`🔐 Attempting login for email: ${email}`);
 
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
-      console.log('❌ User not found for email:', email);
+      Logger.debug('❌ User not found for email:', email);
       throw new ForbiddenException('Usuário não encontrado');
     }
 
-    console.log('✅ User found:', { id: user.id, email: user.email });
-    console.log(
-      'Hash salvo no banco (first 50 chars):',
-      user.password.substring(0, 50) + '...',
-    );
-    console.log('Senha digitada length:', password.length);
-    console.log('Senha digitada (com delimitadores):', `"${password}"`);
+    Logger.debug('✅ User found:', { id: user.id, email: user.email });
 
     try {
-      // ✅ Verificando senha com Argon2
-      console.log('🔄 Verifying password with Argon2...');
       const isPasswordCorrect = await argon.verify(user.password, password);
-      console.log('✅ Senha correta?', isPasswordCorrect);
 
       if (!isPasswordCorrect) {
-        console.log('❌ Password verification failed');
+        Logger.log('❌ Password verification failed');
         throw new UnauthorizedException('Senha incorreta');
       }
 
-      console.log('✅ Password verified successfully');
+      Logger.debug('✅ Password verified successfully');
 
-      // Gerar tokens
-      console.log('🔄 Generating tokens...');
+      Logger.debug('🔄Generating tokens...');
       const tokens = await this.authService.getTokens(user.id, user.email);
 
-      // Atualizar refresh token no banco
-      console.log('🔄 Updating refresh token in database...');
+      Logger.debug('🔄Updating refresh token in database...');
       await this.updateRtUseCase.execute({
         userId: user.id,
         refreshToken: tokens.refresh_token,
       });
 
-      console.log('✅ Login completed successfully for user:', user.id);
+      Logger.debug('✅ Login completed successfully for user:', user.id);
 
       return {
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
       };
     } catch (error) {
-      console.error('💥 Error during login process:', error);
+      Logger.error('💥 Error during login process:', error);
 
       if (error instanceof UnauthorizedException) {
         throw error;

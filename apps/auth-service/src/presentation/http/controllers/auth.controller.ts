@@ -46,7 +46,6 @@ export class AuthController {
 
   @MessagePattern('auth.refresh')
   async refreshTokens(@Payload() data: any) {
-    console.log(data);
     const response = await this.refreshTokensUseCase.execute({
       refreshToken: data.token,
     });

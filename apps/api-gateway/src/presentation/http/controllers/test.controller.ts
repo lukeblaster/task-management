@@ -8,8 +8,10 @@ import {
 } from '@nestjs/common';
 import { SignInDto } from '../dto/auth/sign-in';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
+import { ApiCookieAuth } from '@nestjs/swagger';
 
-@Controller('protected-route')
+@ApiCookieAuth()
+@Controller('auth/protected-route')
 @UseGuards(AtAuthGuard)
 export class TestController {
   constructor() {}
