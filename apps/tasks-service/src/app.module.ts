@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { UserModule } from './modules/user.module';
 import { AppController } from './app.controller';
-import { JwtModule } from '@nestjs/jwt';
-import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/user.typeorm-entity';
-import { AuthModule } from './modules/auth.module';
+import { AppService } from './app.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { TaskTypeOrmEntity } from './infrastructure/database/typeorm/entities/task.typeorm-entity';
+import { CommentTypeOrmEntity } from './infrastructure/database/typeorm/entities/comment.typeorm-entity';
 
 @Module({
   imports: [
@@ -23,27 +22,14 @@ import { AuthModule } from './modules/auth.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        schema: 'auth',
+        schema: 'tasks',
         entities: [__dirname + '/**/*.typeorm-entity{.ts,.js}'],
         synchronize: true,
       }),
     }),
-    UserModule,
-    AuthModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      global: true,
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get('JWT_EXPIRES_IN'),
-        },
-      }),
-    }),
-    TypeOrmModule.forFeature([UserTypeOrmEntity]),
+    TypeOrmModule.forFeature([TaskTypeOrmEntity, CommentTypeOrmEntity]),
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppService, TaskTypeOrmEntity, CommentTypeOrmEntity],
 })
 export class AppModule {}
