@@ -12,7 +12,9 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
@@ -21,7 +23,9 @@ import { CreateTaskDto } from '../dto/task/create-task.dto';
 import { UpdateTaskDto } from '../dto/task/update-task.dto';
 import { ReadTaskDto } from '../dto/task/read-tasks.dto';
 import { DeleteTaskDto } from '../dto/task/delete-task.dto';
+import { AtAuthGuard } from 'src/domain/guards/at.guard';
 
+@UseGuards(AtAuthGuard)
 @Controller('task')
 export class TaskController {
   constructor(
@@ -29,11 +33,10 @@ export class TaskController {
   ) {}
 
   @HttpCode(HttpStatus.OK)
-  @Get('read/:userId')
-  async read(@Param('userId') userId: ReadTaskDto) {
-    if (!userId) return { message: 'Nenhuma tarefa encontrada.' };
+  @Get('read')
+  async read(@Req() req) {
     const response = await firstValueFrom(
-      this.taskClient.send('task.read', userId),
+      this.taskClient.send('task.read', req.user.sub),
     );
 
     if (!response) return { message: 'Nenhuma tarefa encontrada.' };
