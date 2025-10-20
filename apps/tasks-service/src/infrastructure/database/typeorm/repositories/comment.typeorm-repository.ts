@@ -54,6 +54,7 @@ export class TypeOrmCommentRepository implements CommentRepository {
         description: entity.task.description,
         deadline: entity.task.deadline,
         priority: entity.task.priority,
+        authorId: entity.task.authorId,
         responsibles: entity.task.responsibles,
         status: entity.task.status,
       },
@@ -79,6 +80,7 @@ export class TypeOrmCommentRepository implements CommentRepository {
     taskEntity.id = domain.task.id;
     taskEntity.title = domain.task.title;
     taskEntity.description = domain.task.description;
+    taskEntity.authorId = domain.task.authorId;
     taskEntity.status = domain.task.status as EnumStatus;
     taskEntity.priority = domain.task.priority as TaskPriority;
     taskEntity.deadline = domain.task.deadline;

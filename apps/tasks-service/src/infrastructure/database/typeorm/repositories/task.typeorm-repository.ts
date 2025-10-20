@@ -18,11 +18,23 @@ export class TypeOrmTaskRepository implements TaskRepository {
     private readonly typeOrmRepository: Repository<TaskTypeOrmEntity>,
   ) {}
 
-  async findByUserId(id: string): Promise<Task[] | null> {
-    const taskEntity = await this.typeOrmRepository.find({
+  async findById(id: string): Promise<Task | null> {
+    const taskEntity = await this.typeOrmRepository.findOne({
       where: {
-        responsibles: ArrayContains([id]),
+        id: id,
       },
+    });
+
+    if (!taskEntity) {
+      return null;
+    }
+
+    return this.toDomain(taskEntity);
+  }
+
+  async findByUserId(userId: string): Promise<Task[] | null> {
+    const taskEntity = await this.typeOrmRepository.find({
+      where: [{ responsibles: ArrayContains([userId]) }, { authorId: userId }],
     });
 
     if (!taskEntity) {
@@ -47,24 +59,12 @@ export class TypeOrmTaskRepository implements TaskRepository {
   }
 
   private toDomain(entity: TaskTypeOrmEntity): Task {
-    const comments = entity.comments.map((comment) =>
-      Comment.create(
-        {
-          authorId: comment.authorId,
-          content: comment.content,
-          task: task,
-          taskId: comment.taskId,
-          createdAt: comment.createdAt,
-        },
-        comment.id,
-      ),
-    );
-
     const task = Task.create(
       {
         title: entity.title,
         description: entity.description,
         priority: entity.priority,
+        authorId: entity.authorId,
         deadline: entity.deadline,
         status: entity.status,
         responsibles: entity.responsibles,
@@ -72,16 +72,48 @@ export class TypeOrmTaskRepository implements TaskRepository {
       entity.id,
     );
 
-    task.comments = comments;
+    if (entity.comments) {
+      const comments = entity.comments.map((comment) =>
+        Comment.create(
+          {
+            authorId: comment.authorId,
+            content: comment.content,
+            task: task,
+            taskId: comment.taskId,
+            createdAt: comment.createdAt,
+          },
+          comment.id,
+        ),
+      );
+
+      task.comments = comments;
+    }
 
     return task;
   }
 
   private toTypeOrmEntity(domain: Task): TaskTypeOrmEntity {
     const entity = new TaskTypeOrmEntity();
+
+    if (domain.comments.length > 0) {
+      const comments = domain.comments?.map((comment) => {
+        const commentEntity = new CommentTypeOrmEntity();
+        commentEntity.id = comment.id;
+        commentEntity.content = comment.content;
+        commentEntity.authorId = comment.authorId;
+        commentEntity.task = entity;
+        commentEntity.taskId = comment.taskId;
+        commentEntity.createdAt = comment.createdAt;
+        return commentEntity;
+      });
+
+      entity.comments = comments;
+    }
+
     entity.id = domain.id;
     entity.title = domain.title;
     entity.description = domain.description;
+    entity.authorId = domain.authorId;
     entity.priority = domain.priority as TaskPriority;
     entity.deadline = domain.deadline;
     entity.status = domain.status as EnumStatus;

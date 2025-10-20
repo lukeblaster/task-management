@@ -38,6 +38,9 @@ export class TaskTypeOrmEntity {
   @Column({ enum: EnumStatus, default: EnumStatus.TODO })
   status: EnumStatus;
 
-  @Column({ type: 'simple-array' })
+  @Column('text', { array: true })
   responsibles: Array<string>;
+
+  @Column()
+  authorId: string;
 }

@@ -23,6 +23,7 @@ export interface TaskProps {
   priority: TaskPriority;
   status: EnumStatus;
   responsibles: Array<string>;
+  authorId: string;
 }
 
 export class Task {
@@ -98,5 +99,13 @@ export class Task {
 
   set responsibles(value: Array<string>) {
     this.props.responsibles = value;
+  }
+
+  get authorId(): string {
+    return this.props.authorId;
+  }
+
+  set authorId(value: string) {
+    this.props.authorId = value;
   }
 }
