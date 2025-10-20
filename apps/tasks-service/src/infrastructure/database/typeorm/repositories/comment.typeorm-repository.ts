@@ -16,7 +16,6 @@ export class TypeOrmCommentRepository implements CommentRepository {
   constructor(
     @InjectRepository(CommentTypeOrmEntity)
     private readonly typeOrmRepository: Repository<CommentTypeOrmEntity>,
-    private readonly Task: Task,
   ) {}
 
   async findByTaskId(taskId: string): Promise<Comment[] | null> {

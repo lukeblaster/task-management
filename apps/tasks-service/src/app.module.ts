@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskTypeOrmEntity } from './infrastructure/database/typeorm/entities/task.typeorm-entity';
 import { CommentTypeOrmEntity } from './infrastructure/database/typeorm/entities/comment.typeorm-entity';
 import { TaskModule } from './modules/task.module';
+import { CommentModule } from './modules/comment.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { TaskModule } from './modules/task.module';
     }),
     TypeOrmModule.forFeature([CommentTypeOrmEntity]),
     TaskModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, TaskTypeOrmEntity, CommentTypeOrmEntity],

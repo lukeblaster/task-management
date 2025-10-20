@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CommentController } from 'src/presentation/http/controllers/comment.controller';
 import { TaskController } from 'src/presentation/http/controllers/task.controller';
 
 @Module({
@@ -16,7 +17,7 @@ import { TaskController } from 'src/presentation/http/controllers/task.controlle
       },
     ]),
   ],
-  controllers: [TaskController],
+  controllers: [TaskController, CommentController],
   providers: [],
 })
 export class TaskModule {}

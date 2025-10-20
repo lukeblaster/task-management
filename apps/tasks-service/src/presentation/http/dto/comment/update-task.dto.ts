@@ -1,0 +1,35 @@
+import {
+  IsArray,
+  IsDate,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+import { EnumStatus, TaskPriority } from 'src/domain/entities/task.entity';
+
+export class UpdateTaskDto {
+  @IsString()
+  id: string;
+
+  @IsString()
+  title: string;
+
+  @IsString()
+  @MaxLength(200)
+  description: string;
+
+  @IsDate()
+  deadline: Date;
+
+  @IsArray()
+  responsibles?: Array<string>;
+
+  @IsEnum(EnumStatus)
+  @IsOptional()
+  status?: EnumStatus;
+
+  @IsEnum(TaskPriority)
+  @IsOptional()
+  priority?: TaskPriority;
+}

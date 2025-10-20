@@ -6,7 +6,7 @@ export interface CommentProps {
   task: Task;
   taskId: string;
   authorId: string;
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export class Comment {

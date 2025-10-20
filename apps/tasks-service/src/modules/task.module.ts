@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CreateTaskUseCase } from 'src/app/use-cases/create-tasks.use-case';
-import { DeleteTaskUseCase } from 'src/app/use-cases/delete-tasks.use-case';
-import { ReadTaskUseCase } from 'src/app/use-cases/read-tasks.use-case';
-import { UpdateTaskUseCase } from 'src/app/use-cases/update-tasks.use-case';
+import { CreateTaskUseCase } from 'src/app/use-cases/task/create-tasks.use-case';
+import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
+import { ReadTaskUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
+import { UpdateTaskUseCase } from 'src/app/use-cases/task/update-tasks.use-case';
 import { TaskRepository } from 'src/domain/repositories/task.repository';
 import { TaskTypeOrmEntity } from 'src/infrastructure/database/typeorm/entities/task.typeorm-entity';
 import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repositories/task.typeorm-repository';
