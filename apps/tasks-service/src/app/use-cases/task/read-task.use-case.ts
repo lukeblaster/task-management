@@ -8,16 +8,16 @@ import {
 } from 'src/domain/entities/task.entity';
 
 export interface ReadTaskUseCaseRequest {
-  userId: string;
+  id: string;
 }
 
 @Injectable()
 export class ReadTaskUseCase {
   constructor(private readonly taskRepository: TaskRepository) {}
 
-  async execute({ userId }: ReadTaskUseCaseRequest): Promise<Task[] | null> {
-    const tasks = await this.taskRepository.findByUserId(userId);
+  async execute({ id }: ReadTaskUseCaseRequest): Promise<Task | null> {
+    const task = await this.taskRepository.findById(id);
 
-    return tasks;
+    return task;
   }
 }

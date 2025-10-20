@@ -5,18 +5,33 @@ import { CreateTaskDto } from '../dto/task/create-task.dto';
 import { UpdateTaskDto } from '../dto/task/update-task.dto';
 import { UpdateTaskUseCase } from 'src/app/use-cases/task/update-tasks.use-case';
 import { ReadTaskDto } from '../dto/task/read-tasks.dto';
-import { ReadTaskUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
+import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
+import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
 
 @Controller('task')
 export class TaskController {
   constructor(
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
-    private readonly readTasksUseCase: ReadTaskUseCase,
+    private readonly readTaskUseCase: ReadTaskUseCase,
+    private readonly readTasksUseCase: ReadTasksUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
   ) {}
+
+  @MessagePattern('task.id')
+  async readTask111(@Payload() param: string) {
+    console.log(param);
+
+    const tasks = await this.readTaskUseCase.execute({
+      id: param,
+    });
+
+    if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
+
+    return { tasks };
+  }
 
   @MessagePattern('task.read')
   async readTasks(@Payload() param: string) {

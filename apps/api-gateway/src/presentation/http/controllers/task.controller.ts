@@ -11,6 +11,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -24,16 +25,28 @@ import { UpdateTaskDto } from '../dto/task/update-task.dto';
 import { ReadTaskDto } from '../dto/task/read-tasks.dto';
 import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
+import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 
 @UseGuards(AtAuthGuard)
-@Controller('task')
+@Controller('tasks')
 export class TaskController {
   constructor(
     @Inject('TASK_SERVICE') private readonly taskClient: ClientProxy,
   ) {}
 
   @HttpCode(HttpStatus.OK)
-  @Get('read')
+  @Get(':id')
+  async readById(@Param('id') id: string) {
+    console.log(id);
+    const response = await firstValueFrom(this.taskClient.send('task.id', id));
+
+    if (!response) return { message: 'Nenhuma tarefa encontrada.' };
+
+    return response;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('')
   async read(@Req() req) {
     const response = await firstValueFrom(
       this.taskClient.send('task.read', req.user.sub),
@@ -45,7 +58,7 @@ export class TaskController {
   }
 
   @HttpCode(HttpStatus.CREATED)
-  @Post('create')
+  @Post('')
   async create(
     @Body() body: CreateTaskDto,
     @Res({ passthrough: true }) res: Response,
@@ -60,7 +73,7 @@ export class TaskController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Patch('update/:id')
+  @Put(':id')
   async updateTask(@Param('id') id: string, @Body() body: UpdateTaskDto) {
     const response = await firstValueFrom(
       this.taskClient.send('task.update', { id, ...body }),
@@ -72,11 +85,41 @@ export class TaskController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Delete('delete/:id')
+  @Delete(':id')
   async deleteTask(@Param('id') id: DeleteTaskDto) {
     const response = await firstValueFrom(
       this.taskClient.send('task.delete', { id }),
     );
     return { message: 'Tarefa deletada com sucesso. ' };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':id/comments')
+  async getComments(@Param('id') id: string, @Req() req) {
+    const response = await firstValueFrom(
+      this.taskClient.send('comment.read', id),
+    );
+
+    if (!response) return { message: 'Nenhum comentário encontrada.' };
+
+    return response;
+  }
+
+  @HttpCode(HttpStatus.CREATED)
+  @Post(':id/comments')
+  async createComment(
+    @Req() req,
+    @Body() body: CreateCommentDto,
+    @Param('id') id: string,
+  ) {
+    const { content } = body;
+    const userId = req.user.sub;
+    const response = await firstValueFrom(
+      this.taskClient.send('comment.create', { userId, taskId: id, content }),
+    );
+
+    if (!response) return { message: 'Não foi possível criar o comentário.' };
+
+    return response;
   }
 }

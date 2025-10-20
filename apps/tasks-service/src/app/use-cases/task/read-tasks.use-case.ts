@@ -7,15 +7,15 @@ import {
   TaskPriority,
 } from 'src/domain/entities/task.entity';
 
-export interface ReadTaskUseCaseRequest {
+export interface ReadTasksUseCaseRequest {
   userId: string;
 }
 
 @Injectable()
-export class ReadTaskUseCase {
+export class ReadTasksUseCase {
   constructor(private readonly taskRepository: TaskRepository) {}
 
-  async execute({ userId }: ReadTaskUseCaseRequest): Promise<Task[] | null> {
+  async execute({ userId }: ReadTasksUseCaseRequest): Promise<Task[] | null> {
     const tasks = await this.taskRepository.findByUserId(userId);
 
     return tasks;

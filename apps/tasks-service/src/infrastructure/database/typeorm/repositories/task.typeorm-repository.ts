@@ -23,6 +23,7 @@ export class TypeOrmTaskRepository implements TaskRepository {
       where: {
         id: id,
       },
+      relations: ['comments'],
     });
 
     if (!taskEntity) {
@@ -35,6 +36,7 @@ export class TypeOrmTaskRepository implements TaskRepository {
   async findByUserId(userId: string): Promise<Task[] | null> {
     const taskEntity = await this.typeOrmRepository.find({
       where: [{ responsibles: ArrayContains([userId]) }, { authorId: userId }],
+      relations: ['comments'],
     });
 
     if (!taskEntity) {
@@ -68,26 +70,21 @@ export class TypeOrmTaskRepository implements TaskRepository {
         deadline: entity.deadline,
         status: entity.status,
         responsibles: entity.responsibles,
+        comments:
+          entity.comments?.map((comment) =>
+            Comment.create(
+              {
+                authorId: comment.authorId,
+                content: comment.content,
+                taskId: comment.taskId,
+                createdAt: comment.createdAt,
+              },
+              comment.id,
+            ),
+          ) ?? [],
       },
       entity.id,
     );
-
-    if (entity.comments) {
-      const comments = entity.comments.map((comment) =>
-        Comment.create(
-          {
-            authorId: comment.authorId,
-            content: comment.content,
-            task: task,
-            taskId: comment.taskId,
-            createdAt: comment.createdAt,
-          },
-          comment.id,
-        ),
-      );
-
-      task.comments = comments;
-    }
 
     return task;
   }

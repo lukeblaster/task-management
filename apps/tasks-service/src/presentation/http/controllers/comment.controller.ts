@@ -2,23 +2,25 @@ import { Body, Controller, Logger, Param, Query, Req } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 import { CreateCommentUseCase } from 'src/app/use-cases/comment/create-comment.use-case';
+import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
 
 @Controller('comment')
 export class CommentController {
-  constructor(private readonly createCommentUseCase: CreateCommentUseCase) {}
+  constructor(
+    private readonly createCommentUseCase: CreateCommentUseCase,
+    private readonly readCommentUseCase: ReadCommentUseCase,
+  ) {}
 
-  // @MessagePattern('task.read')
-  // async readTasks(@Payload() param: string) {
-  //   console.log(param);
+  @MessagePattern('comment.read')
+  async readComments(@Payload() param: string) {
+    const comments = await this.readCommentUseCase.execute({
+      taskId: param,
+    });
 
-  //   const tasks = await this.readTasksUseCase.execute({
-  //     userId: param,
-  //   });
+    if (!comments) return { message: 'Nenhum comentário encontrada.' };
 
-  //   if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
-
-  //   return { tasks };
-  // }
+    return { comments };
+  }
 
   @MessagePattern('comment.create')
   async createComment(@Body() body: CreateCommentDto) {

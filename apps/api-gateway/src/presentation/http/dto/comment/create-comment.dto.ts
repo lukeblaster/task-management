@@ -4,7 +4,4 @@ export class CreateCommentDto {
   @IsString()
   @MaxLength(200)
   content: string;
-
-  @IsString()
-  taskId: string;
 }

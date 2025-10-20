@@ -9,6 +9,8 @@ import { CommentController } from 'src/presentation/http/controllers/comment.con
 import { TaskModule } from './task.module';
 import { TaskRepository } from 'src/domain/repositories/task.repository';
 import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repositories/task.typeorm-repository';
+import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
+import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repos
       useClass: TypeOrmTaskRepository,
     },
     CreateCommentUseCase,
+    ReadCommentUseCase,
+    ReadTasksUseCase,
   ],
   exports: [],
 })

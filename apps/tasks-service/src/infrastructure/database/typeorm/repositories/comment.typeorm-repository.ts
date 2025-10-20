@@ -23,6 +23,10 @@ export class TypeOrmCommentRepository implements CommentRepository {
       where: {
         taskId: taskId,
       },
+      relations: ['task'],
+      order: {
+        createdAt: 'ASC',
+      },
     });
 
     if (!commentEntity) {
@@ -75,19 +79,20 @@ export class TypeOrmCommentRepository implements CommentRepository {
   private toTypeOrmEntity(domain: Comment): CommentTypeOrmEntity {
     const entity = new CommentTypeOrmEntity();
 
-    const taskEntity = new TaskTypeOrmEntity();
-    taskEntity.id = domain.task.id;
-    taskEntity.title = domain.task.title;
-    taskEntity.description = domain.task.description;
-    taskEntity.authorId = domain.task.authorId;
-    taskEntity.status = domain.task.status as EnumStatus;
-    taskEntity.priority = domain.task.priority as TaskPriority;
-    taskEntity.deadline = domain.task.deadline;
+    if (domain.task) {
+      const taskEntity = new TaskTypeOrmEntity();
+      taskEntity.id = domain.task.id;
+      taskEntity.title = domain.task.title;
+      taskEntity.description = domain.task.description;
+      taskEntity.authorId = domain.task.authorId;
+      taskEntity.status = domain.task.status as EnumStatus;
+      taskEntity.priority = domain.task.priority as TaskPriority;
+      taskEntity.deadline = domain.task.deadline;
+    }
 
     entity.id = domain.id;
     entity.content = domain.content;
     entity.authorId = domain.authorId;
-    entity.task = taskEntity;
     entity.taskId = domain.taskId;
     entity.createdAt = domain.createdAt;
 

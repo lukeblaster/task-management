@@ -3,7 +3,7 @@ import { Task } from './task.entity';
 
 export interface CommentProps {
   content: string;
-  task: Task;
+  task?: Task;
   taskId: string;
   authorId: string;
   createdAt?: Date;
@@ -37,8 +37,8 @@ export class Comment {
     this.props.content = value;
   }
 
-  get task(): Task {
-    return this.props.task;
+  get task(): Task | null {
+    return this.props.task || null;
   }
 
   set task(value: Task) {
