@@ -26,6 +26,7 @@ import { ReadTaskDto } from '../dto/task/read-tasks.dto';
 import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';
+import { PaginationDto } from '../dto/pagination/pagination.dto';
 
 @UseGuards(AtAuthGuard)
 @Controller('tasks')
@@ -47,9 +48,13 @@ export class TaskController {
 
   @HttpCode(HttpStatus.OK)
   @Get('')
-  async read(@Req() req) {
+  async read(@Query() pagination: PaginationDto, @Req() req) {
     const response = await firstValueFrom(
-      this.taskClient.send('task.read', req.user.sub),
+      this.taskClient.send('task.read', {
+        userId: req.user.sub,
+        page: pagination.page,
+        size: pagination.size,
+      }),
     );
 
     if (!response) return { message: 'Nenhuma tarefa encontrada.' };
@@ -95,9 +100,16 @@ export class TaskController {
 
   @HttpCode(HttpStatus.OK)
   @Get(':id/comments')
-  async getComments(@Param('id') id: string, @Req() req) {
+  async getComments(
+    @Query() pagination: PaginationDto,
+    @Param('id') id: string,
+  ) {
     const response = await firstValueFrom(
-      this.taskClient.send('comment.read', id),
+      this.taskClient.send('comment.read', {
+        taskId: id,
+        page: pagination.page,
+        size: pagination.size,
+      }),
     );
 
     if (!response) return { message: 'Nenhum comentário encontrada.' };

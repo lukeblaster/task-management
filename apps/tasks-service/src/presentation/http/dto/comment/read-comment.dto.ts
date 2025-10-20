@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class ReadTaskDto {
+export class ReadCommentsDto {
   @IsString()
-  userId: string;
+  taskId: string;
 }

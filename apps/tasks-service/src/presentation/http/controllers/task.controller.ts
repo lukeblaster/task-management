@@ -9,6 +9,7 @@ import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
 import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
+import { PaginationDto } from '../dto/pagination/pagination.dto';
 
 @Controller('task')
 export class TaskController {
@@ -21,7 +22,7 @@ export class TaskController {
   ) {}
 
   @MessagePattern('task.id')
-  async readTask111(@Payload() param: string) {
+  async readTask(@Payload() param: string) {
     console.log(param);
 
     const tasks = await this.readTaskUseCase.execute({
@@ -34,11 +35,11 @@ export class TaskController {
   }
 
   @MessagePattern('task.read')
-  async readTasks(@Payload() param: string) {
-    console.log(param);
-
+  async readTasks(@Payload() payload: ReadTaskDto & PaginationDto) {
     const tasks = await this.readTasksUseCase.execute({
-      userId: param,
+      userId: payload.userId,
+      page: payload.page,
+      size: payload.size,
     });
 
     if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };

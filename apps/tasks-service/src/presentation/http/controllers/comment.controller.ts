@@ -3,6 +3,8 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 import { CreateCommentUseCase } from 'src/app/use-cases/comment/create-comment.use-case';
 import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
+import { ReadCommentsDto } from '../dto/comment/read-comment.dto';
+import { PaginationDto } from '../dto/pagination/pagination.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -12,9 +14,11 @@ export class CommentController {
   ) {}
 
   @MessagePattern('comment.read')
-  async readComments(@Payload() param: string) {
+  async readComments(@Payload() payload: ReadCommentsDto & PaginationDto) {
     const comments = await this.readCommentUseCase.execute({
-      taskId: param,
+      taskId: payload.taskId,
+      page: payload.page,
+      size: payload.size,
     });
 
     if (!comments) return { message: 'Nenhum comentário encontrada.' };

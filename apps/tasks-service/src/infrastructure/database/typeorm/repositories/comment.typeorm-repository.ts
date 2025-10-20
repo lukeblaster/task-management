@@ -10,6 +10,7 @@ import {
   TaskPriority,
 } from 'src/domain/entities/task.entity';
 import { TaskTypeOrmEntity } from '../entities/task.typeorm-entity';
+import { PaginationResult } from 'src/type/pagination-result.interface';
 
 @Injectable()
 export class TypeOrmCommentRepository implements CommentRepository {
@@ -18,8 +19,12 @@ export class TypeOrmCommentRepository implements CommentRepository {
     private readonly typeOrmRepository: Repository<CommentTypeOrmEntity>,
   ) {}
 
-  async findByTaskId(taskId: string): Promise<Comment[] | null> {
-    const commentEntity = await this.typeOrmRepository.find({
+  async findByTaskId(
+    taskId: string,
+    page: number = 1,
+    size: number = 10,
+  ): Promise<PaginationResult<Comment> | null> {
+    const [commentEntities, total] = await this.typeOrmRepository.findAndCount({
       where: {
         taskId: taskId,
       },
@@ -27,13 +32,22 @@ export class TypeOrmCommentRepository implements CommentRepository {
       order: {
         createdAt: 'ASC',
       },
+      skip: (page - 1) * size,
+      take: size,
     });
 
-    if (!commentEntity) {
+    if (commentEntities.length === 0) {
       return null;
     }
 
-    return commentEntity.map((comment) => this.toDomain(comment));
+    const comments = commentEntities.map((comment) => this.toDomain(comment));
+
+    return {
+      data: comments,
+      total,
+      page,
+      lastPage: Math.ceil(total / size),
+    };
   }
 
   async create(comment: Comment): Promise<void> {
