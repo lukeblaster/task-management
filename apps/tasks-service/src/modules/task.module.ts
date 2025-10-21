@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CreateTaskUseCase } from 'src/app/use-cases/task/create-tasks.use-case';
 import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
@@ -11,7 +12,20 @@ import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repos
 import { TaskController } from 'src/presentation/http/controllers/task.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TaskTypeOrmEntity])],
+  imports: [
+    TypeOrmModule.forFeature([TaskTypeOrmEntity]),
+    ClientsModule.register([
+      {
+        name: 'NOTIFICATION_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin@localhost:5672'],
+          queue: 'notifications_queue',
+          queueOptions: { durable: false },
+        },
+      },
+    ]),
+  ],
   controllers: [TaskController],
   providers: [
     TaskTypeOrmEntity,

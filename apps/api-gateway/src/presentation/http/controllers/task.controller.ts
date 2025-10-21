@@ -3,13 +3,10 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   HttpCode,
-  HttpException,
   HttpStatus,
   Inject,
   Param,
-  Patch,
   Post,
   Put,
   Query,
@@ -22,7 +19,6 @@ import { firstValueFrom } from 'rxjs';
 import type { Response } from 'express';
 import { CreateTaskDto } from '../dto/task/create-task.dto';
 import { UpdateTaskDto } from '../dto/task/update-task.dto';
-import { ReadTaskDto } from '../dto/task/read-tasks.dto';
 import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';

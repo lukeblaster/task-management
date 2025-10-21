@@ -1,5 +1,5 @@
-import { Body, Controller, Logger, Param, Query } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { Body, Controller, Inject, Logger, Param, Query } from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateTaskUseCase } from 'src/app/use-cases/task/create-tasks.use-case';
 import { CreateTaskDto } from '../dto/task/create-task.dto';
 import { UpdateTaskDto } from '../dto/task/update-task.dto';
@@ -14,6 +14,8 @@ import { PaginationDto } from '../dto/pagination/pagination.dto';
 @Controller('task')
 export class TaskController {
   constructor(
+    @Inject('NOTIFICATION_SERVICE')
+    private readonly notificationClient: ClientProxy,
     private readonly createTaskUseCase: CreateTaskUseCase,
     private readonly updateTaskUseCase: UpdateTaskUseCase,
     private readonly readTaskUseCase: ReadTaskUseCase,
@@ -70,6 +72,13 @@ export class TaskController {
     });
 
     if (!task) return { message: 'Não foi possível criar a tarefa.' };
+
+    this.notificationClient.emit('task.created', {
+      title: 'Uma nova tarefa foi criada!',
+      body: 'Clique aqui para acessar os detalhes',
+      taskId: task.id,
+      userId: task.authorId,
+    });
 
     return { task: task, message: 'Tarefa criada com sucesso.' };
   }
