@@ -11,9 +11,22 @@ import { TaskRepository } from 'src/domain/repositories/task.repository';
 import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repositories/task.typeorm-repository';
 import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
 import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
+    ClientsModule.register([
+      {
+        name: 'NOTIFICATION_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin@localhost:5672'],
+          queue: 'notifications_queue',
+          queueOptions: { durable: false },
+        },
+      },
+    ]),
+
     TypeOrmModule.forFeature([CommentTypeOrmEntity, TaskTypeOrmEntity]),
     TaskModule,
   ],

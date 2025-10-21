@@ -73,11 +73,13 @@ export class TaskController {
 
     if (!task) return { message: 'Não foi possível criar a tarefa.' };
 
-    this.notificationClient.emit('task.created', {
-      title: 'Uma nova tarefa foi criada!',
-      body: 'Clique aqui para acessar os detalhes',
-      taskId: task.id,
-      userId: task.authorId,
+    task.responsibles?.forEach((element) => {
+      this.notificationClient.emit('task:created', {
+        body: `${title.substring(0, 20)}`,
+        taskId: task.id,
+        userId: task.authorId,
+        resposibleId: element,
+      });
     });
 
     return { task: task, message: 'Tarefa criada com sucesso.' };
@@ -96,6 +98,17 @@ export class TaskController {
       responsibles: responsibles,
       priority: priority,
       status: status,
+    });
+
+    console.log();
+
+    task.responsibles?.forEach((element) => {
+      this.notificationClient.emit('task:updated', {
+        body: `${title.substring(0, 20)}`,
+        taskId: task.id,
+        userId: task.authorId,
+        resposibleId: element,
+      });
     });
 
     if (!task) return { message: 'Não foi possível atualizar a tarefa.' };

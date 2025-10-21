@@ -1,5 +1,13 @@
-import { Body, Controller, Logger, Param, Query, Req } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  Body,
+  Controller,
+  Inject,
+  Logger,
+  Param,
+  Query,
+  Req,
+} from '@nestjs/common';
+import { ClientProxy, MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 import { CreateCommentUseCase } from 'src/app/use-cases/comment/create-comment.use-case';
 import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
@@ -9,6 +17,8 @@ import { PaginationDto } from '../dto/pagination/pagination.dto';
 @Controller('comment')
 export class CommentController {
   constructor(
+    @Inject('NOTIFICATION_SERVICE')
+    private readonly notificationClient: ClientProxy,
     private readonly createCommentUseCase: CreateCommentUseCase,
     private readonly readCommentUseCase: ReadCommentUseCase,
   ) {}
@@ -34,6 +44,17 @@ export class CommentController {
       content,
       taskId,
       authorId: userId,
+    });
+
+    console.log(comment.task?.responsibles);
+
+    comment.task?.responsibles?.forEach((element) => {
+      this.notificationClient.emit('comment:new', {
+        body: `${comment.task?.title.substring(0, 20)}`,
+        taskId: taskId,
+        userId: userId,
+        resposibleId: element,
+      });
     });
 
     if (!comment) return { message: 'Não foi possível criar o comentário.' };

@@ -8,6 +8,8 @@ import { NotificationRepository } from './domain/repositories/notification.repos
 import { TypeOrmNotificationRepository } from './infrastructure/database/typeorm/repositories/notification.typeorm-repository';
 import { NotificationTypeOrmEntity } from './infrastructure/database/typeorm/entities/notification.typeorm-entity';
 import { NotificationController } from './presentation/http/controllers/notification.controller';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { NotificationsGateway } from './presentation/websocket/gateway/notification.gateway';
 
 @Module({
   imports: [
@@ -31,6 +33,17 @@ import { NotificationController } from './presentation/http/controllers/notifica
       }),
     }),
     TypeOrmModule.forFeature([NotificationTypeOrmEntity]),
+    ClientsModule.register([
+      {
+        name: 'AUTH_SERVICE',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin@localhost:5672'],
+          queue: 'auth_queue',
+          queueOptions: { durable: false },
+        },
+      },
+    ]),
   ],
   controllers: [AppController, NotificationController],
   providers: [
@@ -40,6 +53,7 @@ import { NotificationController } from './presentation/http/controllers/notifica
       useClass: TypeOrmNotificationRepository,
     },
     CreateNotificationUseCase,
+    NotificationsGateway,
   ],
 })
 export class AppModule {}

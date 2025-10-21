@@ -7,9 +7,6 @@ import {
 
 export class CreateNotificationDto {
   @IsString()
-  title: string;
-
-  @IsString()
   @MaxLength(100)
   @IsOptional()
   body: string;
@@ -19,4 +16,7 @@ export class CreateNotificationDto {
 
   @IsString()
   taskId: string;
+
+  @IsString()
+  resposibleId: string;
 }

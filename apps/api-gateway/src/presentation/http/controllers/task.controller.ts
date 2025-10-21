@@ -64,6 +64,7 @@ export class TaskController {
     @Body() body: CreateTaskDto,
     @Res({ passthrough: true }) res: Response,
   ) {
+    console.log(body);
     const response = await firstValueFrom(
       this.taskClient.send('task.create', body),
     );
