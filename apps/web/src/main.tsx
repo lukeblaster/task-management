@@ -1,60 +1,42 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import "./style.css";
-import typescriptLogo from "/typescript.svg";
-import { Header, Counter } from "@repo/ui";
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
+import { StrictMode } from 'react'
+import ReactDOM from 'react-dom/client'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 
-const SOCKET_URL = "http://localhost:3005"; // Porta do notifications-service
+// Import the generated route tree
+import { routeTree } from './routeTree.gen'
 
-const App = () => {
-  const [messages, setMessages] = useState<string[]>([]);
-  const [connected, setConnected] = useState(false);
+import './styles.css'
+import reportWebVitals from './reportWebVitals.ts'
 
-  useEffect(() => {
-    // Substitua pelo JWT real do usuário logado
-    const token = "";
+// Create a new router instance
+const router = createRouter({
+  routeTree,
+  context: {},
+  defaultPreload: 'intent',
+  scrollRestoration: true,
+  defaultStructuralSharing: true,
+  defaultPreloadStaleTime: 0,
+})
 
-    const socket: Socket = io(SOCKET_URL, {
-      transports: ["websocket"],
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router
+  }
+}
 
-    socket.on("connect", () => {
-      console.log("✅ Conectado ao WebSocket");
-      setConnected(true);
-    });
+// Render the app
+const rootElement = document.getElementById('app')
+if (rootElement && !rootElement.innerHTML) {
+  const root = ReactDOM.createRoot(rootElement)
+  root.render(
+    <StrictMode>
+      <RouterProvider router={router} />
+    </StrictMode>,
+  )
+}
 
-    socket.on("notification", (data) => {
-      console.log("📩 Nova notificação:", data);
-      setMessages((prev) => [...prev, JSON.stringify(data)]);
-    });
-
-    socket.on("disconnect", () => {
-      console.log("❌ Desconectado do WebSocket");
-      setConnected(false);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  return (
-    <div style={{ fontFamily: "sans-serif", padding: 20 }}>
-      <h2>🔌 Teste de conexão WebSocket</h2>
-      <p>Status: {connected ? "🟢 Conectado" : "🔴 Desconectado"}</p>
-      <h3>📬 Notificações recebidas:</h3>
-      <ul>
-        {messages.map((msg, i) => (
-          <li key={i}>{msg}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-createRoot(document.getElementById("app")!).render(<App />);
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals()
