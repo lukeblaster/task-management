@@ -1,54 +1,45 @@
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogFooter } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import { FieldGroup, FieldSet } from "@/components/ui/field";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
-import { ParticipantsPicker } from "./set-participants";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
-import type { TaskProps } from "@/types/Task";
-
-export enum TaskPriority {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-  URGENT = "URGENT",
-}
-
-export enum EnumStatus {
-  TODO = "TO DO",
-  IN_PROGRESS = "IN PROGRESS",
-  REVIEW = "REVIEW",
-  DONE = "DONE",
-}
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTask } from "@/api/tasks/delete-task";
+import { useNavigate } from "@tanstack/react-router";
 
 export const deleteTaskSchema = z.object({
   id: z.string({ message: "Valor é obrigatório" }),
 });
 
-type UpdateTaskInput = z.infer<typeof deleteTaskSchema>;
+export type DeleteTaskInput = z.infer<typeof deleteTaskSchema>;
 
-const usersMock = ["1", "2", "3"];
-
-export default function DeleteTaskForm({ task }: { task: TaskProps }) {
-  const {
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UpdateTaskInput>({
+export default function DeleteTaskForm({ taskId }: { taskId: string }) {
+  const navigate = useNavigate();
+  const { handleSubmit } = useForm<DeleteTaskInput>({
     resolver: standardSchemaResolver(deleteTaskSchema),
     defaultValues: {
-      id: "task.id",
+      id: taskId,
     },
   });
 
-  const onSubmit: SubmitHandler<UpdateTaskInput> = async (data) => {
-    console.log(data);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: deleteTask,
+    onSuccess: (response) => {
+      console.log(response);
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+      navigate({
+        to: "/app/tasks",
+      });
+    },
+    onError: (response) => {
+      console.log(response);
+    },
+  });
+
+  const onSubmit: SubmitHandler<DeleteTaskInput> = async (data) => {
+    await mutation.mutateAsync(data);
   };
 
   return (

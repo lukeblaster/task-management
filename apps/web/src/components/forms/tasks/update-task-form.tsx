@@ -12,24 +12,18 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
-import type { TaskProps } from "@/types/Task";
-
-export enum TaskPriority {
-  LOW = "LOW",
-  MEDIUM = "MEDIUM",
-  HIGH = "HIGH",
-  URGENT = "URGENT",
-}
-
-export enum EnumStatus {
-  TODO = "TO DO",
-  IN_PROGRESS = "IN PROGRESS",
-  REVIEW = "REVIEW",
-  DONE = "DONE",
-}
+import {
+  EnumStatus,
+  EnumStatusMap,
+  TaskPriority,
+  TaskPriorityMap,
+  type TaskProps,
+} from "@/types/Task";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateTask } from "@/api/tasks/update-task";
 
 export const updateTaskSchema = z.object({
-  // id: z.uuid(),
+  id: z.uuid(),
   title: z
     .string({ message: "Valor é obrigatório" })
     .min(5, "Título deve ser maior"),
@@ -40,7 +34,7 @@ export const updateTaskSchema = z.object({
   responsibles: z.array(z.string()).min(1, "Selecione ao menos 1 responsável"),
 });
 
-type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
+export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 
 const usersMock = ["1", "2", "3"];
 
@@ -54,11 +48,23 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
   } = useForm<UpdateTaskInput>({
     resolver: standardSchemaResolver(updateTaskSchema),
     defaultValues: {
-      title: task.title,
+      id: task.id,
+      title: task?.title,
       description: task.description,
       priority: task.priority,
       status: task.status,
       responsibles: task.responsibles,
+    },
+  });
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: updateTask,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["tasks", task.id] });
+      console.log(response);
+    },
+    onError: (response) => {
+      console.log(response);
     },
   });
 
@@ -80,7 +86,7 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
   }
 
   const onSubmit: SubmitHandler<UpdateTaskInput> = async (data) => {
-    console.log(data);
+    await mutation.mutateAsync(data);
   };
 
   return (
@@ -93,7 +99,7 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
               <input
                 className="input"
                 {...register("title")}
-                defaultValue={task.title}
+                defaultValue={task?.title}
                 placeholder="Fazer relatório"
               />
               {errors.title && (
@@ -145,16 +151,22 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
                   })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="capitalize">
                   <SelectValue placeholder="Selecione um status" />
                 </SelectTrigger>
-                <SelectContent className="w-full">
-                  <SelectItem value={EnumStatus.TODO}>Pendente</SelectItem>
-                  <SelectItem value={EnumStatus.IN_PROGRESS}>
-                    Em andamento
+                <SelectContent className="w-full *:capitalize">
+                  <SelectItem value={`${EnumStatus.TODO}`}>
+                    {EnumStatusMap["TODO"]}
                   </SelectItem>
-                  <SelectItem value={EnumStatus.REVIEW}>Em revisão</SelectItem>
-                  <SelectItem value={EnumStatus.DONE}>Concluído</SelectItem>
+                  <SelectItem value={`${EnumStatus.IN_PROGRESS}`}>
+                    {EnumStatusMap["IN_PROGRESS"]}
+                  </SelectItem>
+                  <SelectItem value={`${EnumStatus.REVIEW}`}>
+                    {EnumStatusMap["REVIEW"]}
+                  </SelectItem>
+                  <SelectItem value={`${EnumStatus.DONE}`}>
+                    {EnumStatusMap["DONE"]}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {errors.status && (
@@ -175,14 +187,22 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
                   })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="capitalize">
                   <SelectValue placeholder="Selecione uma prioridade" />
                 </SelectTrigger>
-                <SelectContent className="w-full">
-                  <SelectItem value={TaskPriority.LOW}>Baixa</SelectItem>
-                  <SelectItem value={TaskPriority.MEDIUM}>Médida</SelectItem>
-                  <SelectItem value={TaskPriority.HIGH}>Alta</SelectItem>
-                  <SelectItem value={TaskPriority.URGENT}>Urgente</SelectItem>
+                <SelectContent className="w-full *:capitalize">
+                  <SelectItem value={TaskPriority.LOW}>
+                    {TaskPriorityMap["LOW"]}
+                  </SelectItem>
+                  <SelectItem value={TaskPriority.MEDIUM}>
+                    {TaskPriorityMap["MEDIUM"]}
+                  </SelectItem>
+                  <SelectItem value={TaskPriority.HIGH}>
+                    {TaskPriorityMap["HIGH"]}
+                  </SelectItem>
+                  <SelectItem value={TaskPriority.URGENT}>
+                    {TaskPriorityMap["URGENT"]}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               {errors.status && (

@@ -26,6 +26,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tanstack/react-router": "^1.133.22",
     "@tanstack/react-router-devtools": "^1.133.22",
+    "@tanstack/react-table": "^8.21.3",
     "@tanstack/router-plugin": "^1.133.22",
     "@tanstack/router-vite-plugin": "^1.133.22",
     "axios": "^1.12.2",

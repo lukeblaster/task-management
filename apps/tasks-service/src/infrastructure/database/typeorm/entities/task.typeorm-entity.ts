@@ -9,7 +9,7 @@ enum TaskPriority {
 }
 
 enum EnumStatus {
-  TODO = 'TO DO',
+  TODO = 'TODO',
   IN_PROGRESS = 'IN PROGRESS',
   REVIEW = 'REVIEW',
   DONE = 'DONE',

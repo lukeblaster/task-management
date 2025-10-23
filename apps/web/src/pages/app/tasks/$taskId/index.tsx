@@ -1,7 +1,5 @@
-import CreateTaskForm from "@/components/forms/tasks/create-task-form";
 import DeleteTaskForm from "@/components/forms/tasks/delete-task-form";
 import UpdateTaskForm from "@/components/forms/tasks/update-task-form";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,30 +10,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { MessageCard } from "@/components/ui/message-card";
-import { Textarea } from "@/components/ui/textarea";
-import { EnumStatus, TaskPriority, type TaskProps } from "@/types/Task";
-import {
-  AddCircleIcon,
-  ArrowLeft01Icon,
-  Edit01Icon,
-} from "@hugeicons/core-free-icons";
+import { useTaskData } from "@/hooks/use-tasks-id";
+import { type TaskProps } from "@/types/Task";
+import { ArrowLeft01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/app/tasks/$taskId/")({
   component: RouteComponent,
 });
 
-const task: TaskProps = {
-  title: "Comprar pão",
-  description: "Padaria fecha às 17 horas",
-  deadline: new Date(),
-  status: EnumStatus.TODO,
-  priority: TaskPriority.LOW,
-  responsibles: ["1"],
-};
-
 function RouteComponent() {
+  const { taskId } = useParams({
+    from: "/app/tasks/$taskId/",
+  });
+  const task: TaskProps = useTaskData(taskId).data?.data;
+
   return (
     <div className="flex flex-col">
       <div className="lg:px-1 lg:py-6">
@@ -46,22 +36,22 @@ function RouteComponent() {
         <div className="flex justify-between my-6">
           <div className="flex flex-col gap-1">
             <h1 className="text-md lg:text-xl px-0.5 font-semibold">
-              Comprar pão
+              {task?.title}
             </h1>
             <h3 className="text-sm text-muted-foreground">
-              A padaria fecha às 17 horas
+              {task?.description}
             </h3>
             <div className="mt-2 flex flex-col gap-2">
               <p className="flex gap-1 text-sm font-semibold">
                 Prioridade:{" "}
                 <div className="w-fit bg-green-400 text-green-800 font-semibold px-2 py-0.5 rounded-full text-xs">
-                  • baixa
+                  • {task?.priority}
                 </div>
               </p>
               <p className="flex gap-1 text-sm font-semibold">
                 Status:{" "}
                 <div className="w-fit bg-yellow-400 text-yellow-800 font-semibold px-2 py-0.5 rounded-full text-xs">
-                  • pendente
+                  • {task?.status}
                 </div>
               </p>
             </div>
@@ -100,7 +90,7 @@ function RouteComponent() {
                     Esta ação é irreversível
                   </DialogDescription>
                 </DialogHeader>
-                <DeleteTaskForm task={task} />
+                <DeleteTaskForm taskId={`${task?.id}`} />
               </DialogContent>
             </Dialog>
           </div>

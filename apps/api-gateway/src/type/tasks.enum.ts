@@ -6,8 +6,8 @@ export enum TaskPriority {
 }
 
 export enum EnumStatus {
-  TODO = 'TO DO',
-  IN_PROGRESS = 'IN PROGRESS',
+  TODO = 'TO_DO',
+  IN_PROGRESS = 'IN_PROGRESS',
   REVIEW = 'REVIEW',
   DONE = 'DONE',
 }

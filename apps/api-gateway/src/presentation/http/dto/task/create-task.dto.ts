@@ -1,4 +1,12 @@
-import { IsArray, IsDate, IsString, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsDate,
+  IsEnum,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
+import { EnumStatus, TaskPriority } from 'src/type/tasks.enum';
 
 export class CreateTaskDto {
   @IsString()
@@ -13,4 +21,12 @@ export class CreateTaskDto {
 
   @IsArray()
   responsibles: Array<string>;
+
+  @IsEnum(EnumStatus)
+  @IsOptional()
+  status?: EnumStatus;
+
+  @IsEnum(TaskPriority)
+  @IsOptional()
+  priority?: TaskPriority;
 }

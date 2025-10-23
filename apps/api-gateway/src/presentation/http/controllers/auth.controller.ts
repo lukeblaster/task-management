@@ -41,14 +41,14 @@ export class AuthController {
 
     res.cookie('access_token', response.access_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: '/',
       sameSite: 'none',
     });
 
     res.cookie('refresh_token', response.refresh_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: '/',
       sameSite: 'none',
     });
@@ -71,14 +71,14 @@ export class AuthController {
   async refreshTokens(@Req() req, @Res({ passthrough: true }) res) {
     res.cookie('access_token', req.user.access_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: '/',
       sameSite: 'none',
     });
 
     res.cookie('refresh_token', req.user.refresh_token, {
       httpOnly: true,
-      secure: false,
+      secure: true,
       path: '/',
       sameSite: 'none',
     });

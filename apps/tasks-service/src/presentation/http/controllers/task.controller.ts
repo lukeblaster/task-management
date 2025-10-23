@@ -10,6 +10,7 @@ import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case'
 import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
+import { TaskPresenter } from '../presenters/task.presenter';
 
 @Controller('task')
 export class TaskController {
@@ -33,7 +34,7 @@ export class TaskController {
 
     if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
 
-    return { tasks };
+    return TaskPresenter.toHTTP(tasks);
   }
 
   @MessagePattern('task.read')
@@ -46,7 +47,10 @@ export class TaskController {
 
     if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
 
-    return { tasks };
+    const { data, page, lastPage, total } = tasks;
+    const presentedTasks = data.map((task) => TaskPresenter.toHTTP(task));
+
+    return { data: presentedTasks, page, lastPage, total };
   }
 
   @MessagePattern('task.create')
@@ -60,6 +64,8 @@ export class TaskController {
       status,
       authorId,
     } = body;
+
+    console.log(body);
 
     const task = await this.createTaskUseCase.execute({
       title: title,
@@ -82,7 +88,7 @@ export class TaskController {
       });
     });
 
-    return { task: task, message: 'Tarefa criada com sucesso.' };
+    return { task, message: 'Tarefa criada com sucesso.' };
   }
 
   @MessagePattern('task.update')
@@ -113,7 +119,7 @@ export class TaskController {
 
     if (!task) return { message: 'Não foi possível atualizar a tarefa.' };
 
-    return { task: task, message: 'Tarefa atualizada com sucesso.' };
+    return { task, message: 'Tarefa atualizada com sucesso.' };
   }
 
   @MessagePattern('task.delete')

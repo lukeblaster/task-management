@@ -14,9 +14,10 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { signIn } from "@/api/auth/sign-in";
 
 export const Route = createFileRoute("/_auth/login")({
   component: RouteComponent,
@@ -27,19 +28,31 @@ export const LoginSchema = z.object({
   password: z.string(),
 });
 
-type LoginInput = z.infer<typeof LoginSchema>;
+export type LoginInput = z.infer<typeof LoginSchema>;
 
 function RouteComponent() {
+  const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginInput>();
+  const mutation = useMutation({
+    mutationFn: signIn,
+    onSuccess: (response) => {
+      // console.log(response);
+      navigate({ to: "/app/tasks" });
+    },
+    onError: (response) => {
+      console.log(response);
+    },
+  });
 
-  const onSubmit: SubmitHandler<LoginInput> = async () => {
-    const response = () => {};
-
-    return response;
+  const onSubmit: SubmitHandler<LoginInput> = async (data) => {
+    await mutation.mutateAsync({
+      email: data.email,
+      password: data.password,
+    });
   };
   return (
-    <div className="h-full w-full flex bg-background justify-center items-center ">
-      <Card className="border-accent flex flex-col py-12 w-3/4 lg:w-1/4 rounded-xl justify-center blur-out-2xl">
+    <div className="h-screen w-screen flex bg-background justify-center items-center">
+      <Card className="border-accent flex flex-col py-12 w-3/4 md:1/4 lg:w-1/3 2xl:w-1/4 rounded-xl justify-center blur-out-2xl">
         <CardHeader>
           <CardTitle>Bem-vindo de volta ao Taskly</CardTitle>
           <CardDescription>
@@ -53,8 +66,9 @@ function RouteComponent() {
                 <FieldGroup>
                   <Field>
                     <FieldLabel htmlFor="user">E-mail</FieldLabel>
-                    <Input
+                    <input
                       id="user"
+                      className="input"
                       {...register("email")}
                       placeholder="E-mail"
                       required
@@ -62,8 +76,9 @@ function RouteComponent() {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="password">Senha</FieldLabel>
-                    <Input
+                    <input
                       type="password"
+                      className="input"
                       {...register("password")}
                       id="password"
                       placeholder="Senha"
