@@ -12,6 +12,7 @@ import {
 import {
   CheckmarkSquare03Icon,
   TaskDaily02Icon,
+  UserMultipleIcon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
@@ -34,6 +35,14 @@ export function AppSidebar() {
                   <Link to="/app/tasks">
                     <HugeiconsIcon icon={TaskDaily02Icon} strokeWidth={2} />
                     <span className="font-semibold">Minhas tarefas</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/app/users">
+                    <HugeiconsIcon icon={UserMultipleIcon} strokeWidth={2} />
+                    <span className="font-semibold">Usuários</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

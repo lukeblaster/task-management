@@ -13,7 +13,9 @@ import { Route as AppLayoutRouteImport } from './pages/app/layout'
 import { Route as IndexRouteImport } from './pages/index'
 import { Route as AuthRegisterRouteImport } from './pages/_auth/register'
 import { Route as AuthLoginRouteImport } from './pages/_auth/login'
+import { Route as AppUsersIndexRouteImport } from './pages/app/users/index'
 import { Route as AppTasksIndexRouteImport } from './pages/app/tasks/index'
+import { Route as AppTasksTaskIdIndexRouteImport } from './pages/app/tasks/$taskId/index'
 
 const AppLayoutRoute = AppLayoutRouteImport.update({
   id: '/app',
@@ -35,9 +37,19 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppUsersIndexRoute = AppUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
 const AppTasksIndexRoute = AppTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
+  getParentRoute: () => AppLayoutRoute,
+} as any)
+const AppTasksTaskIdIndexRoute = AppTasksTaskIdIndexRouteImport.update({
+  id: '/tasks/$taskId/',
+  path: '/tasks/$taskId/',
   getParentRoute: () => AppLayoutRoute,
 } as any)
 
@@ -47,6 +59,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/app/tasks': typeof AppTasksIndexRoute
+  '/app/users': typeof AppUsersIndexRoute
+  '/app/tasks/$taskId': typeof AppTasksTaskIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +68,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/app/tasks': typeof AppTasksIndexRoute
+  '/app/users': typeof AppUsersIndexRoute
+  '/app/tasks/$taskId': typeof AppTasksTaskIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,12 +78,28 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/app/tasks/': typeof AppTasksIndexRoute
+  '/app/users/': typeof AppUsersIndexRoute
+  '/app/tasks/$taskId/': typeof AppTasksTaskIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/login' | '/register' | '/app/tasks'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/register'
+    | '/app/tasks'
+    | '/app/users'
+    | '/app/tasks/$taskId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/login' | '/register' | '/app/tasks'
+  to:
+    | '/'
+    | '/app'
+    | '/login'
+    | '/register'
+    | '/app/tasks'
+    | '/app/users'
+    | '/app/tasks/$taskId'
   id:
     | '__root__'
     | '/'
@@ -75,6 +107,8 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/app/tasks/'
+    | '/app/users/'
+    | '/app/tasks/$taskId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,6 +148,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/users/': {
+      id: '/app/users/'
+      path: '/users'
+      fullPath: '/app/users'
+      preLoaderRoute: typeof AppUsersIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
     '/app/tasks/': {
       id: '/app/tasks/'
       path: '/tasks'
@@ -121,15 +162,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTasksIndexRouteImport
       parentRoute: typeof AppLayoutRoute
     }
+    '/app/tasks/$taskId/': {
+      id: '/app/tasks/$taskId/'
+      path: '/tasks/$taskId'
+      fullPath: '/app/tasks/$taskId'
+      preLoaderRoute: typeof AppTasksTaskIdIndexRouteImport
+      parentRoute: typeof AppLayoutRoute
+    }
   }
 }
 
 interface AppLayoutRouteChildren {
   AppTasksIndexRoute: typeof AppTasksIndexRoute
+  AppUsersIndexRoute: typeof AppUsersIndexRoute
+  AppTasksTaskIdIndexRoute: typeof AppTasksTaskIdIndexRoute
 }
 
 const AppLayoutRouteChildren: AppLayoutRouteChildren = {
   AppTasksIndexRoute: AppTasksIndexRoute,
+  AppUsersIndexRoute: AppUsersIndexRoute,
+  AppTasksTaskIdIndexRoute: AppTasksTaskIdIndexRoute,
 }
 
 const AppLayoutRouteWithChildren = AppLayoutRoute._addFileChildren(

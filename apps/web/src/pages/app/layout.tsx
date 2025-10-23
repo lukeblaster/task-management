@@ -12,7 +12,7 @@ function RouteComponent() {
   return (
     <SidebarProvider className="bg-sidebar">
       <AppSidebar />
-      <main className="m-2 p-2 bg-background rounded-xl w-full">
+      <main className="m-2 px-4 py-2 bg-background rounded-xl w-full">
         <SidebarTrigger />
         <Outlet />
       </main>
