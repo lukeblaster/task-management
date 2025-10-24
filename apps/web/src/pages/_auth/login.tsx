@@ -18,6 +18,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api/auth/sign-in";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export const Route = createFileRoute("/_auth/login")({
   component: RouteComponent,
@@ -31,13 +32,20 @@ export const LoginSchema = z.object({
 export type LoginInput = z.infer<typeof LoginSchema>;
 
 function RouteComponent() {
+  const updateUser = useAuthStore().updateUser;
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginInput>();
   const mutation = useMutation({
     mutationFn: signIn,
     onSuccess: (response) => {
-      // console.log(response);
-      navigate({ to: "/app/tasks" });
+      updateUser(response.data.user);
+      navigate({
+        to: "/app/tasks",
+        search: {
+          page: 1,
+          size: 10,
+        },
+      });
     },
     onError: (response) => {
       console.log(response);

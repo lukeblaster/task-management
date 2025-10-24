@@ -39,7 +39,7 @@ export default function RootComponent() {
       <QueryClientProvider client={queryClient}>
         <SocketGateway />
         <Outlet />
-        <TanStackRouterDevtools position="bottom-left" />
+        <TanStackRouterDevtools position="bottom-right" />
         <Toaster expand />
       </QueryClientProvider>
     </>

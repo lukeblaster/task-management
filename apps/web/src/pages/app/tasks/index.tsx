@@ -24,7 +24,7 @@ function RouteComponent() {
     total: number;
   } = useTasksData(page, size).data?.data;
 
-  if (!data)
+  if (!data?.data)
     return (
       <div className="flex flex-col">
         <div className="lg:px-1 lg:py-6">

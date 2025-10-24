@@ -16,6 +16,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Link } from "@tanstack/react-router";
+import { SidebarProfileMenu } from "./sidebar-profile-menu";
 
 export function AppSidebar() {
   return (
@@ -32,7 +33,13 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <Link to="/app/tasks">
+                  <Link
+                    to="/app/tasks"
+                    search={{
+                      page: 1,
+                      size: 10,
+                    }}
+                  >
                     <HugeiconsIcon icon={TaskDaily02Icon} strokeWidth={2} />
                     <span className="font-semibold">Minhas tarefas</span>
                   </Link>
@@ -49,6 +56,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        <SidebarProfileMenu />
       </SidebarContent>
     </Sidebar>
   );
