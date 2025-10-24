@@ -12,12 +12,13 @@ import {
   FieldDescription,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
-  FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { signUp } from "@/api/auth/register";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 export const Route = createFileRoute("/_auth/register")({
   component: RouteComponent,
@@ -25,7 +26,7 @@ export const Route = createFileRoute("/_auth/register")({
 
 const RegisterSchema = z
   .object({
-    name: z
+    username: z
       .string()
       .min(6, { message: "Nome deve ter no mínimo 6 caracteres." }),
     email: z.string().email({ message: "E-mail inválido." }),
@@ -47,16 +48,39 @@ const RegisterSchema = z
 type RegisterInput = z.infer<typeof RegisterSchema>;
 
 function RouteComponent() {
-  const { register, handleSubmit } = useForm<RegisterInput>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterInput>({
+    resolver: standardSchemaResolver(RegisterSchema),
+  });
+
+  const navigate = useNavigate({
+    from: "/register",
+  });
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: signUp,
+    onSuccess: (response) => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      navigate({
+        to: "/login",
+      });
+      toast.success(response.data.message);
+    },
+    onError: () => {
+      toast.error("Não foi possível criar o usuário. Tente novamente depois!");
+    },
+  });
 
   const onSubmit: SubmitHandler<RegisterInput> = async (data) => {
-    const response = () => {};
-
-    return response;
+    await mutation.mutateAsync({ ...data });
   };
+
   return (
-    <div className="h-full w-full flex bg-background justify-center items-center ">
-      <Card className="border-accent flex flex-col py-12 w-3/4 lg:w-1/4 rounded-xl justify-center blur-out-2xl">
+    <div className="h-screen w-full flex bg-background justify-center items-center ">
+      <Card className="border-accent flex flex-col py-12 w-3/4 md:1/4 lg:w-1/3 2xl:w-1/4 rounded-xl justify-center blur-out-2xl">
         <CardHeader>
           <CardTitle>Comece a usar o Taskly</CardTitle>
           <CardDescription>Preencha os campos e crie sua conta</CardDescription>
@@ -64,56 +88,69 @@ function RouteComponent() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="w-full">
             <FieldGroup>
-              <FieldSet>
-                <FieldLegend></FieldLegend>
+              <Field>
+                <FieldLabel>Nome do usuário</FieldLabel>
+                <input
+                  className="input"
+                  {...register("username")}
+                  placeholder="Lucas Silva"
+                />
+                {errors.username && (
+                  <span className="text-red-500 text-sm">
+                    {errors.username.message}
+                  </span>
+                )}
+              </Field>
 
-                <FieldGroup>
-                  <Field>
-                    <FieldLabel htmlFor="name">Nome</FieldLabel>
-                    <Input
-                      id="name"
-                      {...register("name")}
-                      placeholder="Lucas Silva"
-                      required
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="user">Usuário</FieldLabel>
-                    <Input
-                      id="user"
-                      {...register("email")}
-                      placeholder="lucas@gmail.com"
-                      required
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="password">Senha</FieldLabel>
-                    <Input
-                      type="password"
-                      {...register("password")}
-                      id="password"
-                      placeholder="Informe sua senha"
-                      required
-                    />
-                  </Field>
-                  <Field>
-                    <FieldLabel htmlFor="password">Confirme a senha</FieldLabel>
-                    <Input
-                      type="password"
-                      {...register("password")}
-                      id="password"
-                      placeholder="Confirme sua senha"
-                      required
-                    />
-                  </Field>
-                  <Field>
-                    <Button>Fazer login</Button>
-                    <FieldDescription className="text-center">
-                      Já tem conta? <Link to="/login">Faça login</Link>
-                    </FieldDescription>
-                  </Field>
-                </FieldGroup>
-              </FieldSet>
+              <Field>
+                <FieldLabel>E-mail</FieldLabel>
+                <input
+                  {...register("email")}
+                  placeholder="lucas@gmail.com"
+                  className="max-h-[150px] input"
+                />
+                {errors.email && (
+                  <span className="text-red-500 text-sm">
+                    {errors.email.message}
+                  </span>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel>Nova senha</FieldLabel>
+                <input
+                  className="input"
+                  type="password"
+                  {...register("password")}
+                  placeholder="Nova senha"
+                />
+                {errors.password && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </span>
+                )}
+              </Field>
+
+              <Field>
+                <FieldLabel>Confirme a senha</FieldLabel>
+                <input
+                  className="input"
+                  type="password"
+                  {...register("password_confirm")}
+                  placeholder="Confirme a senha"
+                />
+                {errors.password_confirm && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password_confirm.message}
+                  </span>
+                )}
+              </Field>
+              <Field>
+                <Button type="submit">Criar conta</Button>
+                <FieldDescription className="text-center">
+                  Já tem conta? <Link to="/login">Faça login</Link>
+                </FieldDescription>
+              </Field>
             </FieldGroup>
           </form>
         </CardContent>

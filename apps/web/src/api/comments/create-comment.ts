@@ -3,12 +3,14 @@ import { instance as axios } from "../axios";
 
 export const createComment = async ({
   taskId,
+  authorName,
   content,
 }: CreateCommentInput) => {
   const response = await axios.post(
     `/tasks/${taskId}/comments`,
     JSON.stringify({
       content,
+      authorName,
     })
   );
 

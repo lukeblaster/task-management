@@ -17,14 +17,9 @@ function RouteComponent() {
   const { page, size } = useSearch({
     from: "/app/tasks/",
   });
-  const data: {
-    data: TaskProps[];
-    lastPage: number;
-    page: string;
-    total: number;
-  } = useTasksData(page, size).data?.data;
+  const { data: response, isFetched } = useTasksData(page, size);
 
-  if (!data?.data)
+  if (!isFetched)
     return (
       <div className="flex flex-col">
         <div className="lg:px-1 lg:py-6">
@@ -40,7 +35,12 @@ function RouteComponent() {
       </div>
     );
 
-  const { data: tasks, total } = data;
+  const taskData = response?.data as {
+    data: TaskProps[];
+    lastPage: number;
+    page: string;
+    total: number;
+  };
 
   return (
     <div className="flex flex-col">
@@ -52,8 +52,8 @@ function RouteComponent() {
           <CreateTaskForm />
         </div>
         <TaskTable
-          data={tasks}
-          rowCount={total}
+          data={taskData?.data ?? []}
+          rowCount={taskData?.total}
           pageCount={Number(page)}
           size={size}
         />

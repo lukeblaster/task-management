@@ -5,6 +5,7 @@ export interface CommentProps {
   content: string;
   task?: Task;
   taskId: string;
+  authorName: string;
   authorId: string;
   createdAt?: Date;
 }
@@ -51,6 +52,14 @@ export class Comment {
 
   get authorId(): string {
     return this.props.authorId;
+  }
+
+  get authorName(): string {
+    return this.props.authorName;
+  }
+
+  set authorName(value: string) {
+    this.props.authorName = value;
   }
 
   get createdAt(): Date {

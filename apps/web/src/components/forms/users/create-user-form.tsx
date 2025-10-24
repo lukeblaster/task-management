@@ -4,6 +4,10 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { toast } from "sonner";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { signUp } from "@/api/auth/register";
+import axios from "axios";
 
 export const createUserSchema = z
   .object({
@@ -26,9 +30,13 @@ export const createUserSchema = z
     }
   });
 
-type CreateUserInput = z.infer<typeof createUserSchema>;
+export type CreateUserInput = z.infer<typeof createUserSchema>;
 
-export default function CreateUserForm() {
+export default function CreateUserForm({
+  setIsDialogOpen,
+}: {
+  setIsDialogOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const {
     register,
     handleSubmit,
@@ -37,8 +45,29 @@ export default function CreateUserForm() {
     resolver: standardSchemaResolver(createUserSchema),
   });
 
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: signUp,
+    onSuccess: () => {
+      if (setIsDialogOpen) setIsDialogOpen(false);
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+    onError: (response) => {
+      toast.error(response.message);
+    },
+  });
+
   const onSubmit: SubmitHandler<CreateUserInput> = async (data) => {
-    console.log(data);
+    toast.promise(mutation.mutateAsync({ ...data }), {
+      loading: "Criando usuário...",
+      success: (data) => `${data.data.message}`,
+      error: (err) => {
+        if (axios.isAxiosError(err)) {
+          return err.response?.data?.message ?? "Erro desconhecido";
+        }
+        return "Erro ao criar usuário.";
+      },
+    });
   };
 
   return (

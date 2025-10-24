@@ -7,12 +7,14 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { createComment } from "@/api/comments/create-comment";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export const createCommentSchema = z.object({
   taskId: z.uuid(),
   content: z
     .string({ message: "Informe um valor válido" })
     .min(1, "Comentário não pode ser nulo"),
+  authorName: z.string(),
 });
 
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
@@ -21,6 +23,7 @@ export default function CreateCommentForm() {
   const { taskId } = useParams({
     from: "/app/tasks/$taskId/",
   });
+  const user = useAuthStore().user;
   const {
     register,
     handleSubmit,
@@ -30,6 +33,7 @@ export default function CreateCommentForm() {
     resolver: standardSchemaResolver(createCommentSchema),
     defaultValues: {
       taskId: taskId,
+      authorName: user?.username,
     },
   });
 

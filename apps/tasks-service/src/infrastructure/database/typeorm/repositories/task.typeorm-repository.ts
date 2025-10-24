@@ -91,6 +91,7 @@ export class TypeOrmTaskRepository implements TaskRepository {
             Comment.create(
               {
                 authorId: comment.authorId,
+                authorName: comment.authorName,
                 content: comment.content,
                 taskId: comment.taskId,
                 createdAt: comment.createdAt,

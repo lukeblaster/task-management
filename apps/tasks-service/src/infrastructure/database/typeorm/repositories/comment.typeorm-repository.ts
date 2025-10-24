@@ -82,6 +82,7 @@ export class TypeOrmCommentRepository implements CommentRepository {
       {
         content: entity.content,
         task: task,
+        authorName: entity.authorName,
         authorId: entity.authorId,
         taskId: entity.taskId,
         createdAt: entity.createdAt,
@@ -106,6 +107,7 @@ export class TypeOrmCommentRepository implements CommentRepository {
 
     entity.id = domain.id;
     entity.content = domain.content;
+    entity.authorName = domain.authorName;
     entity.authorId = domain.authorId;
     entity.taskId = domain.taskId;
     entity.createdAt = domain.createdAt;

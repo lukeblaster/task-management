@@ -65,7 +65,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('signup')
+  @Post('register')
   async signUp(@Body() credential: SignInDto) {
     const response = await firstValueFrom(
       this.authClient.send('signup', credential),

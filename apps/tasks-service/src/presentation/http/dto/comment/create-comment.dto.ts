@@ -9,5 +9,8 @@ export class CreateCommentDto {
   content: string;
 
   @IsString()
+  authorName: string;
+
+  @IsString()
   taskId: string;
 }

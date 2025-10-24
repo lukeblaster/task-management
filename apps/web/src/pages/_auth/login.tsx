@@ -19,6 +19,7 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { signIn } from "@/api/auth/sign-in";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_auth/login")({
   component: RouteComponent,
@@ -46,9 +47,10 @@ function RouteComponent() {
           size: 10,
         },
       });
+      toast.success(response.data.message);
     },
-    onError: (response) => {
-      console.log(response);
+    onError: () => {
+      toast.error("Usuário e/ou senha incorretos");
     },
   });
 

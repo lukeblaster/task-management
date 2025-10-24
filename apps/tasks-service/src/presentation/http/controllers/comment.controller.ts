@@ -48,9 +48,10 @@ export class CommentController {
 
   @MessagePattern('comment.create')
   async createComment(@Body() body: CreateCommentDto) {
-    const { userId, content, taskId } = body;
+    const { userId, content, taskId, authorName } = body;
 
     const comment = await this.createCommentUseCase.execute({
+      authorName,
       content,
       taskId,
       authorId: userId,

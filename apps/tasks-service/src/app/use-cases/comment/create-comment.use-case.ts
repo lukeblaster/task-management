@@ -5,6 +5,7 @@ import { Comment } from 'src/domain/entities/comment.entity';
 import { CommentRepository } from 'src/domain/repositories/comment.repository';
 
 export interface CreateCommentUseCaseRequest {
+  authorName: string;
   authorId: string;
   content: string;
   taskId: string;
@@ -18,6 +19,7 @@ export class CreateCommentUseCase {
   ) {}
 
   async execute({
+    authorName,
     authorId,
     content,
     taskId,
@@ -27,6 +29,7 @@ export class CreateCommentUseCase {
     if (!task) throw new Error('Task inválida');
 
     const comment = Comment.create({
+      authorName,
       authorId,
       content,
       task,

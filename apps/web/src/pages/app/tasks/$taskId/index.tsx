@@ -8,6 +8,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { CommentsTab } from "./-components/comments-tab";
 import { AuditLogTab } from "./-components/audit-log-tab";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/app/tasks/$taskId/")({
   component: RouteComponent,
@@ -22,10 +23,26 @@ function RouteComponent() {
     from: "/app/tasks/$taskId/",
   });
 
-  const task: TaskProps = useTaskData(taskId).data?.data;
-  const date = new Date(task?.deadline).toLocaleDateString();
+  const { data: response, isFetched } = useTaskData(taskId);
 
-  if (!task) return <div>Carregando...</div>;
+  if (!isFetched)
+    return (
+      <div className="flex flex-col">
+        <div className="lg:px-1 lg:py-6">
+          <div className="flex justify-between items-end mb-6">
+            <h1 className="text-md lg:text-xl font-semibold px-0.5">
+              <Skeleton className="h-6 w-24" />
+            </h1>
+            <Skeleton className="h-12 w-24" />
+          </div>
+          <Skeleton className="h-6 w-48" />
+        </div>
+        <Skeleton className="h-80 w-full" />
+      </div>
+    );
+
+  const task: TaskProps = response?.data;
+  const date = new Date(task?.deadline).toLocaleDateString();
 
   return (
     <div className="flex flex-col">

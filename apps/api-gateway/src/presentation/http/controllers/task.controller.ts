@@ -122,10 +122,15 @@ export class TaskController {
     @Body() body: CreateCommentDto,
     @Param('id') id: string,
   ) {
-    const { content } = body;
+    const { content, authorName } = body;
     const userId = req.user.sub;
     const response = await firstValueFrom(
-      this.taskClient.send('comment.create', { userId, taskId: id, content }),
+      this.taskClient.send('comment.create', {
+        userId,
+        taskId: id,
+        content,
+        authorName,
+      }),
     );
 
     if (!response) return { message: 'Não foi possível criar o comentário.' };

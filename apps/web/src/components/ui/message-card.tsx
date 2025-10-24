@@ -8,10 +8,12 @@ export const CommentCard = ({ comment }: { comment: CommentProps }) => {
     <>
       <div className="flex gap-1 items-top">
         <Avatar className="h-8">
-          <AvatarFallback>LS</AvatarFallback>
+          <AvatarFallback>
+            {comment?.authorName[0].toLocaleUpperCase()}
+          </AvatarFallback>
         </Avatar>
         <div>
-          <span className="text-sm font-semibold">Lucas Soares</span>
+          <span className="text-sm font-semibold">{comment.authorName}</span>
           <Card className="flex flex-col gap-0 bg-card py-1 px-0 *:px-4! *:py-1! w-fit">
             <CardContent className="px-1">
               <p className="text-sm">{comment.content}</p>

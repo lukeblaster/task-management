@@ -1,4 +1,4 @@
-import { Body, Controller } from '@nestjs/common';
+import { Body, Controller, ForbiddenException } from '@nestjs/common';
 import { CreateUserUseCase } from 'src/app/use-cases/users/create-user.use-case';
 import { CreateUserDto } from '../dtos/users/create-user.dto';
 import { UserPresenter } from '../presenters/user.presenter';
@@ -15,6 +15,9 @@ export class UsersController {
   @MessagePattern('signup')
   async create(@Body() body: CreateUserDto) {
     const { username, email, password } = body;
+    console.log(body);
+
+    if (!email) throw new ForbiddenException();
 
     const { user } = await this.createUserUseCase.execute({
       username: username,

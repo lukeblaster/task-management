@@ -26,6 +26,9 @@ export class CommentTypeOrmEntity {
   taskId: string;
 
   @Column()
+  authorName: string;
+
+  @Column()
   authorId: string;
 
   @CreateDateColumn()
