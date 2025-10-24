@@ -12,7 +12,8 @@ import * as cookie from 'cookie';
 import { firstValueFrom } from 'rxjs';
 
 @WebSocketGateway({
-  cors: { origin: '*' },
+  cors: { origin: 'http://localhost:3000', credentials: true },
+  cookie: true,
 })
 export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect

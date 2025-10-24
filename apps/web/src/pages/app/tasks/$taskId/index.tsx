@@ -1,27 +1,9 @@
 import DeleteTaskForm from "@/components/forms/tasks/delete-task-form";
 import UpdateTaskForm from "@/components/forms/tasks/update-task-form";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTaskData } from "@/hooks/use-tasks-id";
-import {
-  EnumStatus,
-  EnumStatusMap,
-  TaskPriorityMap,
-  type TaskProps,
-} from "@/types/Task";
-import {
-  ArrowLeft01Icon,
-  Delete03FreeIcons,
-  Edit01Icon,
-} from "@hugeicons/core-free-icons";
+import { EnumStatusMap, TaskPriorityMap, type TaskProps } from "@/types/Task";
+import { ArrowLeft01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute, Link, useParams } from "@tanstack/react-router";
 import { CommentsTab } from "./-components/comments-tab";
@@ -42,7 +24,8 @@ function RouteComponent() {
 
   const task: TaskProps = useTaskData(taskId).data?.data;
   const date = new Date(task?.deadline).toLocaleDateString();
-  console.log(task);
+
+  if (!task) return <div>Carregando...</div>;
 
   return (
     <div className="flex flex-col">
@@ -78,42 +61,8 @@ function RouteComponent() {
             </div>
           </div>
           <div className="space-x-2">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button>
-                  <HugeiconsIcon icon={Edit01Icon} strokeWidth={2} /> Atualizar
-                  tarefa
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Atualize a tarefa</DialogTitle>
-                  <DialogDescription>
-                    Preencha os campos e salve as alterações
-                  </DialogDescription>
-                </DialogHeader>
-                <UpdateTaskForm task={task} />
-              </DialogContent>
-            </Dialog>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button variant={"destructive"}>
-                  <HugeiconsIcon icon={Delete03FreeIcons} strokeWidth={2} />{" "}
-                  Deletar tarefa
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    Tem certeza que deseja deletar a tarefa?
-                  </DialogTitle>
-                  <DialogDescription>
-                    Esta ação é irreversível
-                  </DialogDescription>
-                </DialogHeader>
-                <DeleteTaskForm taskId={`${task?.id}`} />
-              </DialogContent>
-            </Dialog>
+            <UpdateTaskForm task={task} />
+            <DeleteTaskForm taskId={`${task?.id}`} />
           </div>
         </div>
         <div className="my-8 flex flex-col gap-2">

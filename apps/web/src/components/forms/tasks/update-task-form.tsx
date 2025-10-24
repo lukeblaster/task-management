@@ -1,5 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { DialogClose, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
@@ -23,6 +32,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateTask } from "@/api/tasks/update-task";
 import type { UserProps } from "@/types/User";
 import { useUsersData } from "@/hooks/use-users";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Edit01Icon } from "@hugeicons/core-free-icons";
+import { useState } from "react";
+import { toast } from "sonner";
+import axios from "axios";
 
 export const updateTaskSchema = z.object({
   id: z.uuid(),
@@ -38,9 +52,8 @@ export const updateTaskSchema = z.object({
 
 export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 
-const usersMock = ["1", "2", "3"];
-
 export default function UpdateTaskForm({ task }: { task: TaskProps }) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const users: UserProps[] = useUsersData().data?.data;
   const {
     register,
@@ -52,7 +65,7 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
     resolver: standardSchemaResolver(updateTaskSchema),
     defaultValues: {
       id: task.id,
-      title: task?.title,
+      title: task.title,
       description: task.description,
       priority: task.priority,
       status: task.status,
@@ -62,12 +75,12 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: updateTask,
-    onSuccess: (response) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      console.log(response);
+      setIsDialogOpen(false);
     },
     onError: (response) => {
-      console.log(response);
+      toast.error(response.message);
     },
   });
 
@@ -89,155 +102,181 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
   }
 
   const onSubmit: SubmitHandler<UpdateTaskInput> = async (data) => {
-    await mutation.mutateAsync(data);
+    toast.promise(mutation.mutateAsync(data), {
+      loading: "Atualizando tarefa...",
+      success: (data) => `${data.data.message}`,
+      error: (err) => {
+        if (axios.isAxiosError(err)) {
+          return err.response?.data?.message ?? "Erro desconhecido";
+        }
+        return "Erro ao atualizar tarefa.";
+      },
+    });
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <FieldGroup>
-        <FieldSet>
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogTrigger asChild>
+        <Button>
+          <HugeiconsIcon icon={Edit01Icon} strokeWidth={2} /> Atualizar tarefa
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Atualize a tarefa</DialogTitle>
+          <DialogDescription>
+            Preencha os campos e salve as alterações
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <FieldGroup>
-            <Field>
-              <FieldLabel>Título</FieldLabel>
-              <input
-                className="input"
-                {...register("title")}
-                defaultValue={task?.title}
-                placeholder="Fazer relatório"
-              />
-              {errors.title && (
-                <span className="text-red-500 text-sm">
-                  {errors.title.message}
-                </span>
-              )}
-            </Field>
+            <FieldSet>
+              <FieldGroup>
+                <Field>
+                  <FieldLabel>Título</FieldLabel>
+                  <input
+                    className="input"
+                    {...register("title")}
+                    defaultValue={task?.title}
+                    placeholder="Fazer relatório"
+                  />
+                  {errors.title && (
+                    <span className="text-red-500 text-sm">
+                      {errors.title.message}
+                    </span>
+                  )}
+                </Field>
 
-            <Field>
-              <FieldLabel>Descrição</FieldLabel>
-              <input
-                {...register("description")}
-                defaultValue={task.description}
-                placeholder="Lembrar de adicionar as metas..."
-                className="max-h-[150px] input"
-              />
-              {errors.description && (
-                <span className="text-red-500 text-sm">
-                  {errors.description.message}
-                </span>
-              )}
-            </Field>
+                <Field>
+                  <FieldLabel>Descrição</FieldLabel>
+                  <input
+                    {...register("description")}
+                    defaultValue={task.description}
+                    placeholder="Lembrar de adicionar as metas..."
+                    className="max-h-[150px] input"
+                  />
+                  {errors.description && (
+                    <span className="text-red-500 text-sm">
+                      {errors.description.message}
+                    </span>
+                  )}
+                </Field>
 
-            <Field>
-              <FieldLabel>Data de entrega</FieldLabel>
-              <input
-                className="input"
-                type="date"
-                {...register("deadline")}
-                defaultValue={defaultDate}
-                placeholder="Fazer relatório"
-              />
-              {errors.deadline && (
-                <span className="text-red-500 text-sm">
-                  {errors.deadline.message}
-                </span>
-              )}
-            </Field>
+                <Field>
+                  <FieldLabel>Data de entrega</FieldLabel>
+                  <input
+                    className="input"
+                    type="date"
+                    {...register("deadline")}
+                    defaultValue={defaultDate}
+                    placeholder="Fazer relatório"
+                  />
+                  {errors.deadline && (
+                    <span className="text-red-500 text-sm">
+                      {errors.deadline.message}
+                    </span>
+                  )}
+                </Field>
 
-            <Field>
-              <FieldLabel>Status</FieldLabel>
-              <Select
-                {...register("status")}
-                defaultValue={`${task.status}`}
-                onValueChange={(val) =>
-                  setValue("status", val as EnumStatus, {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger className="capitalize">
-                  <SelectValue placeholder="Selecione um status" />
-                </SelectTrigger>
-                <SelectContent className="w-full *:capitalize">
-                  <SelectItem value={`${EnumStatus.TODO}`}>
-                    {EnumStatusMap["TODO"]}
-                  </SelectItem>
-                  <SelectItem value={`${EnumStatus.IN_PROGRESS}`}>
-                    {EnumStatusMap["IN_PROGRESS"]}
-                  </SelectItem>
-                  <SelectItem value={`${EnumStatus.REVIEW}`}>
-                    {EnumStatusMap["REVIEW"]}
-                  </SelectItem>
-                  <SelectItem value={`${EnumStatus.DONE}`}>
-                    {EnumStatusMap["DONE"]}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.status && (
-                <span className="text-red-500 text-sm">
-                  {errors.status?.message}
-                </span>
-              )}
-            </Field>
+                <Field>
+                  <FieldLabel>Status</FieldLabel>
+                  <Select
+                    {...register("status")}
+                    defaultValue={`${task.status}`}
+                    onValueChange={(val) =>
+                      setValue("status", val as EnumStatus, {
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    <SelectTrigger className="capitalize">
+                      <SelectValue placeholder="Selecione um status" />
+                    </SelectTrigger>
+                    <SelectContent className="w-full *:capitalize">
+                      <SelectItem value={`${EnumStatus.TODO}`}>
+                        {EnumStatusMap["TODO"]}
+                      </SelectItem>
+                      <SelectItem value={`${EnumStatus.IN_PROGRESS}`}>
+                        {EnumStatusMap["IN_PROGRESS"]}
+                      </SelectItem>
+                      <SelectItem value={`${EnumStatus.REVIEW}`}>
+                        {EnumStatusMap["REVIEW"]}
+                      </SelectItem>
+                      <SelectItem value={`${EnumStatus.DONE}`}>
+                        {EnumStatusMap["DONE"]}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.status && (
+                    <span className="text-red-500 text-sm">
+                      {errors.status?.message}
+                    </span>
+                  )}
+                </Field>
 
-            <Field>
-              <FieldLabel>Prioridade</FieldLabel>
-              <Select
-                {...register("priority")}
-                defaultValue={`${task.priority}`}
-                onValueChange={(val) =>
-                  setValue("priority", val as TaskPriority, {
-                    shouldValidate: true,
-                  })
-                }
-              >
-                <SelectTrigger className="capitalize">
-                  <SelectValue placeholder="Selecione uma prioridade" />
-                </SelectTrigger>
-                <SelectContent className="w-full *:capitalize">
-                  <SelectItem value={TaskPriority.LOW}>
-                    {TaskPriorityMap["LOW"]}
-                  </SelectItem>
-                  <SelectItem value={TaskPriority.MEDIUM}>
-                    {TaskPriorityMap["MEDIUM"]}
-                  </SelectItem>
-                  <SelectItem value={TaskPriority.HIGH}>
-                    {TaskPriorityMap["HIGH"]}
-                  </SelectItem>
-                  <SelectItem value={TaskPriority.URGENT}>
-                    {TaskPriorityMap["URGENT"]}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.status && (
-                <span className="text-red-500 text-sm">
-                  {errors.status?.message}
-                </span>
-              )}
-            </Field>
+                <Field>
+                  <FieldLabel>Prioridade</FieldLabel>
+                  <Select
+                    {...register("priority")}
+                    defaultValue={`${task.priority}`}
+                    onValueChange={(val) =>
+                      setValue("priority", val as TaskPriority, {
+                        shouldValidate: true,
+                      })
+                    }
+                  >
+                    <SelectTrigger className="capitalize">
+                      <SelectValue placeholder="Selecione uma prioridade" />
+                    </SelectTrigger>
+                    <SelectContent className="w-full *:capitalize">
+                      <SelectItem value={TaskPriority.LOW}>
+                        {TaskPriorityMap["LOW"]}
+                      </SelectItem>
+                      <SelectItem value={TaskPriority.MEDIUM}>
+                        {TaskPriorityMap["MEDIUM"]}
+                      </SelectItem>
+                      <SelectItem value={TaskPriority.HIGH}>
+                        {TaskPriorityMap["HIGH"]}
+                      </SelectItem>
+                      <SelectItem value={TaskPriority.URGENT}>
+                        {TaskPriorityMap["URGENT"]}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.status && (
+                    <span className="text-red-500 text-sm">
+                      {errors.status?.message}
+                    </span>
+                  )}
+                </Field>
 
-            <Field>
-              <FieldLabel>Responsáveis</FieldLabel>
-              <ParticipantsPicker
-                inputValue={responsiblesValue}
-                users={users ?? []}
-                toggleId={toggleId}
-              />
-              {errors.responsibles && (
-                <span className="text-red-500 text-sm">
-                  {errors.responsibles.message}
-                </span>
-              )}
-            </Field>
+                <Field>
+                  <FieldLabel>Responsáveis</FieldLabel>
+                  <ParticipantsPicker
+                    inputValue={responsiblesValue}
+                    users={users ?? []}
+                    toggleId={toggleId}
+                  />
+                  {errors.responsibles && (
+                    <span className="text-red-500 text-sm">
+                      {errors.responsibles.message}
+                    </span>
+                  )}
+                </Field>
 
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancelar</Button>
-              </DialogClose>
-              <Button type="submit">Salvar</Button>
-            </DialogFooter>
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button variant="outline">Cancelar</Button>
+                  </DialogClose>
+                  <Button disabled={mutation.isPending} type="submit">
+                    Salvar
+                  </Button>
+                </DialogFooter>
+              </FieldGroup>
+            </FieldSet>
           </FieldGroup>
-        </FieldSet>
-      </FieldGroup>
-    </form>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

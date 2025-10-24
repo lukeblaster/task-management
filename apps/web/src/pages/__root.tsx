@@ -8,6 +8,8 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 // import { Spinner } from '../components/Spinner'
 import { QueryClient } from "@tanstack/react-query";
+import { SocketGateway } from "@/websocket";
+import { Toaster } from "@/components/ui/sonner";
 // import type { Auth } from "../utils/auth";
 
 // function RouterSpinner() {
@@ -35,8 +37,10 @@ export default function RootComponent() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
+        <SocketGateway />
         <Outlet />
         <TanStackRouterDevtools position="bottom-left" />
+        <Toaster expand />
       </QueryClientProvider>
     </>
   );

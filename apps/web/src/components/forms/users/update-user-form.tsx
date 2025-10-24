@@ -4,21 +4,7 @@ import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
-import type { TaskProps } from "@/types/Task";
 import type { UserProps } from "@/types/User";
-
-const user = {
-  id: "dsjahd812h1",
-  username: "Lucas Silva",
-  email: "lucas@gmail.com",
-};
 
 export const updateUserSchema = z.object({
   // id: z.uuid(),

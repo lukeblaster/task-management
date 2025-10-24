@@ -15,7 +15,12 @@ async function bootstrap() {
     },
   });
 
-  await app.use(cookieParser.default());
+  app.use(cookieParser.default());
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    credentials: true,
+  });
   await app.startAllMicroservices();
   await app.listen(3005);
 

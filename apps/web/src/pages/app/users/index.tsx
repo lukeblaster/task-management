@@ -21,7 +21,7 @@ export const Route = createFileRoute("/app/users/")({
 
 function RouteComponent() {
   const users: UserProps[] = useUsersData().data?.data;
-  console.log(users);
+
   return (
     <div className="flex flex-col">
       <div className="lg:px-1 lg:py-6">

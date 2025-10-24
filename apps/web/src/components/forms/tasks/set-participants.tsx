@@ -66,7 +66,7 @@ export function ParticipantsPicker({
               <CommandEmpty>Nenhum usuário encontrado.</CommandEmpty>
 
               <CommandGroup>
-                {users.map((user) => {
+                {users?.map((user) => {
                   const selected = inputValue?.includes(user.id);
 
                   return (
