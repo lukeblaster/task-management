@@ -16,6 +16,7 @@ export interface LoginUseCaseRequest {
 }
 
 export interface LoginUseCaseResponse {
+  user: { username: string; email: string };
   access_token: string;
   refresh_token: string;
 }
@@ -65,6 +66,7 @@ export class LoginUseCase {
       Logger.debug('✅ Login completed successfully for user:', user.id);
 
       return {
+        user: { username: user.username, email: user.email },
         access_token: tokens.access_token,
         refresh_token: tokens.refresh_token,
       };

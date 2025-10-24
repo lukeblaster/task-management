@@ -18,12 +18,13 @@ export class AuthController {
 
   @MessagePattern('auth.login')
   async signIn(@AuthHeaders() credentials: AuthHeadersDto) {
-    const { access_token, refresh_token } = await this.loginUseCase.execute({
-      email: credentials.email,
-      password: credentials.password,
-    });
+    const { user, access_token, refresh_token } =
+      await this.loginUseCase.execute({
+        email: credentials.email,
+        password: credentials.password,
+      });
 
-    return { access_token, refresh_token };
+    return { user, access_token, refresh_token };
   }
 
   @MessagePattern('auth.validate')

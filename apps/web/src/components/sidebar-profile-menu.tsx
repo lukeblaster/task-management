@@ -1,4 +1,3 @@
-import { ChevronsUpDown, User2 } from "lucide-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -6,22 +5,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 export const SidebarProfileMenu = () => {
   const user = useAuthStore().user;
-  const isMobile = useIsMobile();
 
   return (
     <SidebarGroup className="mt-auto">

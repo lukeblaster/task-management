@@ -61,7 +61,7 @@ export class AuthController {
       sameSite: 'none',
     });
 
-    return { message: 'Login realizado com sucesso.' };
+    return { message: 'Login realizado com sucesso.', user: response.user };
   }
 
   @HttpCode(HttpStatus.OK)
