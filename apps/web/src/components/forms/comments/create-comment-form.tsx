@@ -1,12 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { DialogClose, DialogFooter } from "@/components/ui/dialog";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import { Field, FieldGroup, FieldSet } from "@/components/ui/field";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import z from "zod";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createTask } from "@/api/tasks/create-task";
 import { useParams } from "@tanstack/react-router";
 import { createComment } from "@/api/comments/create-comment";
 
@@ -41,6 +39,7 @@ export default function CreateCommentForm() {
     onSuccess: (response) => {
       console.log(response);
       queryClient.invalidateQueries({ queryKey: ["comments", taskId] });
+      queryClient.invalidateQueries({ queryKey: ["tasks", taskId] });
       reset();
     },
     onError: (response) => {

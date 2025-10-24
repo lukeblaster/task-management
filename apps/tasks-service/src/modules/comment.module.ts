@@ -12,6 +12,10 @@ import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repos
 import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
 import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { CreateAuditLogUseCase } from 'src/app/use-cases/audit-log/create-audit-log.use-case';
+import { AuditLogRepository } from 'src/domain/repositories/audit-log.repository';
+import { TypeOrmAuditLogRepository } from 'src/infrastructure/database/typeorm/repositories/audit-log.typeorm-repository';
+import { AuditLogOrmEntity } from 'src/infrastructure/database/typeorm/entities/audit-log.typeorm-entity';
 
 @Module({
   imports: [
@@ -27,7 +31,11 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       },
     ]),
 
-    TypeOrmModule.forFeature([CommentTypeOrmEntity, TaskTypeOrmEntity]),
+    TypeOrmModule.forFeature([
+      CommentTypeOrmEntity,
+      TaskTypeOrmEntity,
+      AuditLogOrmEntity,
+    ]),
     TaskModule,
   ],
   controllers: [CommentController],
@@ -41,9 +49,14 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
       provide: TaskRepository,
       useClass: TypeOrmTaskRepository,
     },
+    {
+      provide: AuditLogRepository,
+      useClass: TypeOrmAuditLogRepository,
+    },
     CreateCommentUseCase,
     ReadCommentUseCase,
     ReadTasksUseCase,
+    CreateAuditLogUseCase,
   ],
   exports: [],
 })

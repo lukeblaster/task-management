@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Comment } from './comment.entity';
+import { AuditLog } from './audit-log.entity';
 
 export enum TaskPriority {
   LOW = 'LOW',
@@ -19,6 +20,7 @@ export interface TaskProps {
   title: string;
   description: string;
   comments?: Comment[];
+  auditLog?: AuditLog[];
   deadline: Date;
   priority: TaskPriority;
   status: EnumStatus;
@@ -107,5 +109,13 @@ export class Task {
 
   set authorId(value: string) {
     this.props.authorId = value;
+  }
+
+  get auditLog(): AuditLog[] {
+    return this.props.auditLog ?? [];
+  }
+
+  set auditLog(value: AuditLog[]) {
+    this.props.auditLog = value;
   }
 }

@@ -1,4 +1,3 @@
-import CreateCommentForm from "@/components/forms/comments/create-comment-form";
 import DeleteTaskForm from "@/components/forms/tasks/delete-task-form";
 import UpdateTaskForm from "@/components/forms/tasks/update-task-form";
 import { Button } from "@/components/ui/button";
@@ -10,31 +9,23 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CommentCard } from "@/components/ui/message-card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useCommentsData } from "@/hooks/use-comments";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTaskData } from "@/hooks/use-tasks-id";
-import type { CommentProps } from "@/types/Comment";
-import { type TaskProps } from "@/types/Task";
+import {
+  EnumStatus,
+  EnumStatusMap,
+  TaskPriorityMap,
+  type TaskProps,
+} from "@/types/Task";
 import {
   ArrowLeft01Icon,
   Delete03FreeIcons,
   Edit01Icon,
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useParams,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useParams } from "@tanstack/react-router";
+import { CommentsTab } from "./-components/comments-tab";
+import { AuditLogTab } from "./-components/audit-log-tab";
 
 export const Route = createFileRoute("/app/tasks/$taskId/")({
   component: RouteComponent,
@@ -48,38 +39,10 @@ function RouteComponent() {
   const { taskId } = useParams({
     from: "/app/tasks/$taskId/",
   });
-  const { page, size } = useSearch({
-    from: "/app/tasks/$taskId/",
-  });
-  const navigate = useNavigate({
-    from: "/app/tasks/$taskId",
-  });
 
   const task: TaskProps = useTaskData(taskId).data?.data;
-  const data: {
-    data: CommentProps[];
-    lastPage: number;
-    page: string;
-    total: number;
-  } = useCommentsData(taskId, page, size).data?.data;
-
-  if (!data) return <div>Carregando</div>;
-
-  const { data: comments, lastPage } = data;
-
-  const handlePageChange = (newPage: number) => {
-    navigate({
-      search: (prev) => ({ ...prev, page: newPage }),
-    });
-  };
-
-  const handleSizeChange = (newSize: number) => {
-    navigate({
-      search: (prev) => ({ ...prev, size: newSize, page: 1 }), // volta pra 1
-    });
-  };
-
-  console.log(page, size);
+  const date = new Date(task?.deadline).toLocaleDateString();
+  console.log(task);
 
   return (
     <div className="flex flex-col">
@@ -96,17 +59,20 @@ function RouteComponent() {
             <h3 className="text-sm text-muted-foreground">
               {task?.description}
             </h3>
-            <div className="mt-2 flex flex-col gap-2">
-              <p className="flex gap-1 text-sm font-semibold">
-                Prioridade:{" "}
-                <div className="w-fit bg-green-400 text-green-800 font-semibold px-2 py-0.5 rounded-full text-xs">
-                  • {task?.priority}
+            <div className="mt-2 flex gap-2 capitalize">
+              <p className="flex flex-col gap-1 text-sm font-semibold">
+                <div className="w-fit bg-zinc-300 text-zinc-700 font-semibold px-2 py-0.5 rounded-full text-xs">
+                  {task?.priority && TaskPriorityMap[task?.priority]}
                 </div>
               </p>
-              <p className="flex gap-1 text-sm font-semibold">
-                Status:{" "}
-                <div className="w-fit bg-yellow-400 text-yellow-800 font-semibold px-2 py-0.5 rounded-full text-xs">
-                  • {task?.status}
+              <p className="flex flex-col gap-1 text-sm font-semibold">
+                <div className="w-fit bg-zinc-300 text-zinc-700 font-semibold px-2 py-0.5 rounded-full text-xs">
+                  {task?.status && EnumStatusMap[task?.status]}
+                </div>
+              </p>
+              <p className="flex flex-col gap-1 text-sm font-semibold">
+                <div className="w-fit bg-zinc-300 text-zinc-700 font-semibold px-2 py-0.5 rounded-full text-xs">
+                  {date}
                 </div>
               </p>
             </div>
@@ -151,48 +117,18 @@ function RouteComponent() {
           </div>
         </div>
         <div className="my-8 flex flex-col gap-2">
-          <h2 className="font-semibold text-lg">Comentários</h2>
-          <CreateCommentForm />
-          <div className="flex flex-col px-0.5 py-3 gap-3 max-h-[calc(30%-30px)] overflow-auto">
-            {comments?.map((comment) => (
-              <CommentCard key={comment.id} comment={comment} />
-            ))}
-          </div>
-          <div className="flex ml-auto space-x-2">
-            <Select
-              defaultValue={`${size}`}
-              onValueChange={(e) => {
-                handleSizeChange(Number(e));
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Escolha um valor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="30">30</SelectItem>
-                <SelectItem value="40">40</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              disabled={page <= 1}
-              variant={"outline"}
-              className="w-fit"
-              onClick={() => handlePageChange(page - 1)}
-            >
-              Anterior
-            </Button>
-            <Button
-              disabled={lastPage == page}
-              variant={"outline"}
-              className="w-fit"
-              onClick={() => handlePageChange(page + 1)}
-            >
-              Próximo
-            </Button>
-          </div>
+          <Tabs defaultValue="comments">
+            <TabsList>
+              <TabsTrigger value="comments">Comentários</TabsTrigger>
+              <TabsTrigger value="auditLog">Logs</TabsTrigger>
+            </TabsList>
+            <TabsContent value="comments">
+              <CommentsTab />
+            </TabsContent>
+            <TabsContent value="auditLog">
+              <AuditLogTab auditLogs={task?.auditLogs} />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

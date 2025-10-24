@@ -11,6 +11,7 @@ import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
 import { TaskPresenter } from '../presenters/task.presenter';
+import { CreateAuditLogUseCase } from 'src/app/use-cases/audit-log/create-audit-log.use-case';
 
 @Controller('task')
 export class TaskController {
@@ -22,6 +23,7 @@ export class TaskController {
     private readonly readTaskUseCase: ReadTaskUseCase,
     private readonly readTasksUseCase: ReadTasksUseCase,
     private readonly deleteTaskUseCase: DeleteTaskUseCase,
+    private readonly createAuditLogUseCase: CreateAuditLogUseCase,
   ) {}
 
   @MessagePattern('task.id')
@@ -31,6 +33,8 @@ export class TaskController {
     const tasks = await this.readTaskUseCase.execute({
       id: param,
     });
+
+    console.log(tasks);
 
     if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
 
@@ -79,6 +83,12 @@ export class TaskController {
 
     if (!task) return { message: 'Não foi possível criar a tarefa.' };
 
+    await this.createAuditLogUseCase.execute({
+      authorId,
+      taskId: task.id,
+      message: 'criou a tarefa.',
+    });
+
     task.responsibles?.forEach((element) => {
       this.notificationClient.emit('task:created', {
         body: `${title.substring(0, 20)}`,
@@ -106,8 +116,6 @@ export class TaskController {
       status: status,
     });
 
-    console.log();
-
     task.responsibles?.forEach((element) => {
       this.notificationClient.emit('task:updated', {
         body: `${title.substring(0, 20)}`,
@@ -115,6 +123,12 @@ export class TaskController {
         userId: task.authorId,
         resposibleId: element,
       });
+    });
+
+    await this.createAuditLogUseCase.execute({
+      authorId: task.authorId,
+      taskId: task.id,
+      message: 'atualizou esta tarefa.',
     });
 
     if (!task) return { message: 'Não foi possível atualizar a tarefa.' };

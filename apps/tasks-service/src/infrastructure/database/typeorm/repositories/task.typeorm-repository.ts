@@ -11,6 +11,8 @@ import {
 import { CommentTypeOrmEntity } from '../entities/comment.typeorm-entity';
 import { Comment } from 'src/domain/entities/comment.entity';
 import { PaginationResult } from 'src/type/pagination-result.interface';
+import { AuditLog } from 'src/domain/entities/audit-log.entity';
+import { AuditLogOrmEntity } from '../entities/audit-log.typeorm-entity';
 
 @Injectable()
 export class TypeOrmTaskRepository implements TaskRepository {
@@ -24,7 +26,7 @@ export class TypeOrmTaskRepository implements TaskRepository {
       where: {
         id: id,
       },
-      relations: ['comments'],
+      relations: ['comments', 'auditLog'],
     });
 
     if (!taskEntity) {
@@ -41,7 +43,7 @@ export class TypeOrmTaskRepository implements TaskRepository {
   ): Promise<PaginationResult<Task> | null> {
     const [taskEntities, total] = await this.typeOrmRepository.findAndCount({
       where: [{ responsibles: ArrayContains([userId]) }, { authorId: userId }],
-      relations: ['comments'],
+      relations: ['comments', 'auditLog'],
       skip: (page - 1) * size,
       take: size,
     });
@@ -96,6 +98,18 @@ export class TypeOrmTaskRepository implements TaskRepository {
               comment.id,
             ),
           ) ?? [],
+        auditLog:
+          entity.auditLog?.map((auditLog) =>
+            AuditLog.create(
+              {
+                message: auditLog.message,
+                authorId: auditLog.authorId,
+                taskId: auditLog.taskId,
+                createdAt: auditLog.createdAt,
+              },
+              auditLog.id,
+            ),
+          ) ?? [],
       },
       entity.id,
     );
@@ -119,6 +133,21 @@ export class TypeOrmTaskRepository implements TaskRepository {
       });
 
       entity.comments = comments;
+    }
+
+    if (domain.auditLog.length > 0) {
+      const auditLogs = domain.auditLog?.map((auditLog) => {
+        const auditLogEntity = new AuditLogOrmEntity();
+        auditLogEntity.id = auditLog.id;
+        auditLogEntity.message = auditLog.message;
+        auditLogEntity.authorId = auditLog.authorId;
+        auditLogEntity.task = entity;
+        auditLogEntity.taskId = auditLog.taskId;
+        auditLogEntity.createdAt = auditLog.createdAt;
+        return auditLogEntity;
+      });
+
+      entity.auditLog = auditLogs;
     }
 
     entity.id = domain.id;

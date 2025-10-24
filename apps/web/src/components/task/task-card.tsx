@@ -13,7 +13,14 @@ import type { TaskProps } from "@/types/Task";
 export default function TaskCard({ task }: { task: TaskProps }) {
   const deadline = new Date(task.deadline).toLocaleDateString();
   return (
-    <Link to={`/app/tasks/$taskId`} params={{ taskId: task.id }}>
+    <Link
+      to={`/app/tasks/$taskId`}
+      params={{ taskId: task.id }}
+      search={{
+        page: 1,
+        size: 10,
+      }}
+    >
       <Card>
         <CardHeader>
           <CardTitle className="flex justify-between">

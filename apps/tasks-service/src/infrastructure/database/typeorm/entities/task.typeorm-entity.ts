@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { CommentTypeOrmEntity } from './comment.typeorm-entity';
+import { AuditLogOrmEntity } from './audit-log.typeorm-entity';
 
 enum TaskPriority {
   LOW = 'LOW',
@@ -31,6 +32,12 @@ export class TaskTypeOrmEntity {
     onDelete: 'CASCADE',
   })
   comments: CommentTypeOrmEntity[];
+
+  @OneToMany(() => AuditLogOrmEntity, (audit_log) => audit_log.task, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  auditLog: AuditLogOrmEntity[];
 
   @Column({ type: 'date' })
   deadline: Date;

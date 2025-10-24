@@ -1,3 +1,5 @@
+import type { AuditLogProps } from "./AuditLog";
+
 export enum TaskPriority {
   LOW = "LOW",
   MEDIUM = "MEDIUM",
@@ -32,6 +34,11 @@ export const EnumStatusMap = {
 export type EnumStatusKey = keyof typeof EnumStatusMap;
 export type EnumStatusValue = (typeof EnumStatusMap)[EnumStatusKey];
 
+export interface AuditLog {
+  _id: string;
+  props: AuditLogProps;
+}
+
 export interface TaskProps {
   id: string;
   title: string;
@@ -41,5 +48,6 @@ export interface TaskProps {
   priority?: TaskPriority;
   status?: EnumStatus;
   comments?: string[];
+  auditLogs?: AuditLog[];
   responsibles?: Array<string>;
 }

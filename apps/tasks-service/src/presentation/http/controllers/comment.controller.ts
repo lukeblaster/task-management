@@ -14,6 +14,7 @@ import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-c
 import { ReadCommentsDto } from '../dto/comment/read-comment.dto';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
 import { CommentPresenter } from '../presenters/comment.presenter';
+import { CreateAuditLogUseCase } from 'src/app/use-cases/audit-log/create-audit-log.use-case';
 
 @Controller('comment')
 export class CommentController {
@@ -22,6 +23,7 @@ export class CommentController {
     private readonly notificationClient: ClientProxy,
     private readonly createCommentUseCase: CreateCommentUseCase,
     private readonly readCommentUseCase: ReadCommentUseCase,
+    private readonly createAuditLogUseCase: CreateAuditLogUseCase,
   ) {}
 
   @MessagePattern('comment.read')
@@ -61,6 +63,12 @@ export class CommentController {
         userId: userId,
         resposibleId: element,
       });
+    });
+
+    await this.createAuditLogUseCase.execute({
+      authorId: userId,
+      taskId,
+      message: 'adicionou um comentário a esta tarefa.',
     });
 
     if (!comment) return { message: 'Não foi possível criar o comentário.' };

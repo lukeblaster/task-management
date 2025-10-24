@@ -11,6 +11,7 @@ export class TaskPresenter {
       status: task.status,
       priority: task.priority,
       comments: task.comments,
+      auditLogs: task.auditLog,
       responsibles: task.responsibles,
     };
   }

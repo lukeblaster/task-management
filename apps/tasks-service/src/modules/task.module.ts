@@ -1,19 +1,24 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CreateAuditLogUseCase } from 'src/app/use-cases/audit-log/create-audit-log.use-case';
+import { ReadAuditLogUseCase } from 'src/app/use-cases/audit-log/read-comment.use-case';
 import { CreateTaskUseCase } from 'src/app/use-cases/task/create-tasks.use-case';
 import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
 import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
 import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
 import { UpdateTaskUseCase } from 'src/app/use-cases/task/update-tasks.use-case';
+import { AuditLogRepository } from 'src/domain/repositories/audit-log.repository';
 import { TaskRepository } from 'src/domain/repositories/task.repository';
+import { AuditLogOrmEntity } from 'src/infrastructure/database/typeorm/entities/audit-log.typeorm-entity';
 import { TaskTypeOrmEntity } from 'src/infrastructure/database/typeorm/entities/task.typeorm-entity';
+import { TypeOrmAuditLogRepository } from 'src/infrastructure/database/typeorm/repositories/audit-log.typeorm-repository';
 import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repositories/task.typeorm-repository';
 import { TaskController } from 'src/presentation/http/controllers/task.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([TaskTypeOrmEntity]),
+    TypeOrmModule.forFeature([TaskTypeOrmEntity, AuditLogOrmEntity]),
     ClientsModule.register([
       {
         name: 'NOTIFICATION_SERVICE',
@@ -33,11 +38,17 @@ import { TaskController } from 'src/presentation/http/controllers/task.controlle
       provide: TaskRepository,
       useClass: TypeOrmTaskRepository,
     },
+    {
+      provide: AuditLogRepository,
+      useClass: TypeOrmAuditLogRepository,
+    },
     CreateTaskUseCase,
     UpdateTaskUseCase,
     ReadTaskUseCase,
     ReadTasksUseCase,
     DeleteTaskUseCase,
+    CreateAuditLogUseCase,
+    ReadAuditLogUseCase,
   ],
   exports: [],
 })
