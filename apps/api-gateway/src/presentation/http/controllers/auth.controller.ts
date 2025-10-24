@@ -18,6 +18,7 @@ import { firstValueFrom } from 'rxjs';
 import type { Response } from 'express';
 import { SignInDto } from '../dto/auth/sign-in';
 import { RtAuthGuard } from 'src/domain/guards/rt.guard';
+import { ApiBody, ApiCookieAuth, ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -26,15 +27,34 @@ export class AuthController {
   ) {}
 
   @HttpCode(HttpStatus.OK)
-  @Get('list')
-  async listUsers() {
-    const response = await firstValueFrom(this.authClient.send('list', {}));
-
-    return response;
+  @Post('register')
+  @ApiResponse({
+    status: 200,
+    description: 'Usuário criado com sucesso',
+    schema: {
+      example: {
+        message: 'Usuário criado com sucesso.',
+      },
+    },
+  })
+  async signUp(@Body() credential: SignInDto) {
+    const response = await firstValueFrom(
+      this.authClient.send('signup', credential),
+    );
+    return { message: 'Usuário criado com sucesso.' };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
+  @ApiResponse({
+    status: 200,
+    description: 'Login realizado com sucesso',
+    schema: {
+      example: {
+        message: 'Login realizado com sucesso',
+      },
+    },
+  })
   async signIn(
     @Headers() credential: SignInDto,
     @Res({ passthrough: true }) res: Response,
@@ -64,17 +84,9 @@ export class AuthController {
     return { message: 'Login realizado com sucesso.', user: response.user };
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Post('register')
-  async signUp(@Body() credential: SignInDto) {
-    const response = await firstValueFrom(
-      this.authClient.send('signup', credential),
-    );
-    return { message: 'Usuário criado com sucesso.' };
-  }
-
   @UseGuards(RtAuthGuard)
   @HttpCode(HttpStatus.OK)
+  @ApiCookieAuth()
   @Get('refresh')
   async refreshTokens(@Req() req, @Res({ passthrough: true }) res) {
     res.cookie('access_token', req.user.access_token, {
@@ -94,5 +106,13 @@ export class AuthController {
     Logger.debug('Tokens renovados com sucesso.');
 
     return { message: 'Tokens renovados com sucesso.' };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('list')
+  async listUsers() {
+    const response = await firstValueFrom(this.authClient.send('list', {}));
+
+    return response;
   }
 }

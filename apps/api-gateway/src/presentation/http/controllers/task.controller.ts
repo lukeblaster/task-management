@@ -23,6 +23,7 @@ import { DeleteTaskDto } from '../dto/task/delete-task.dto';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
 import { CreateCommentDto } from '../dto/comment/create-comment.dto';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
+import { ApiCookieAuth, ApiParam, ApiResponse } from '@nestjs/swagger';
 
 @UseGuards(AtAuthGuard)
 @Controller('tasks')
@@ -31,19 +32,25 @@ export class TaskController {
     @Inject('TASK_SERVICE') private readonly taskClient: ClientProxy,
   ) {}
 
-  @HttpCode(HttpStatus.OK)
-  @Get(':id')
-  async readById(@Param('id') id: string) {
-    console.log(id);
-    const response = await firstValueFrom(this.taskClient.send('task.id', id));
+  @HttpCode(HttpStatus.CREATED)
+  @Post('')
+  async create(
+    @Req() req,
+    @Body() body: CreateTaskDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const response = await firstValueFrom(
+      this.taskClient.send('task.create', { authorId: req.user.sub, ...body }),
+    );
 
-    if (!response) return { message: 'Nenhuma tarefa encontrada.' };
+    if (!response) return { message: 'Não foi possível criar a tarefa. ' };
 
     return response;
   }
 
   @HttpCode(HttpStatus.OK)
   @Get('')
+  @ApiCookieAuth()
   async read(@Query() pagination: PaginationDto, @Req() req) {
     const response = await firstValueFrom(
       this.taskClient.send('task.read', {
@@ -58,19 +65,21 @@ export class TaskController {
     return response;
   }
 
-  @HttpCode(HttpStatus.CREATED)
-  @Post('')
-  async create(
-    @Req() req,
-    @Body() body: CreateTaskDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    console.log(body);
-    const response = await firstValueFrom(
-      this.taskClient.send('task.create', { authorId: req.user.sub, ...body }),
-    );
+  @HttpCode(HttpStatus.OK)
+  @Get(':id')
+  @ApiResponse({
+    status: 200,
+    description: 'Consulta de tarefa única',
+    schema: {
+      example: {
+        task: [],
+      },
+    },
+  })
+  async readById(@Param('id') id: string) {
+    const response = await firstValueFrom(this.taskClient.send('task.id', id));
 
-    if (!response) return { message: 'Não foi possível criar a tarefa. ' };
+    if (!response) return { message: 'Nenhuma tarefa encontrada.' };
 
     return response;
   }
@@ -96,44 +105,44 @@ export class TaskController {
     return { message: 'Tarefa deletada com sucesso. ' };
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Get(':id/comments')
-  async getComments(
-    @Query() pagination: PaginationDto,
-    @Param('id') id: string,
-  ) {
-    const response = await firstValueFrom(
-      this.taskClient.send('comment.read', {
-        taskId: id,
-        page: pagination.page,
-        size: pagination.size,
-      }),
-    );
-
-    if (!response) return { message: 'Nenhum comentário encontrada.' };
-
-    return response;
-  }
-
   @HttpCode(HttpStatus.CREATED)
-  @Post(':id/comments')
+  @Post(':taskId/comments')
   async createComment(
     @Req() req,
     @Body() body: CreateCommentDto,
-    @Param('id') id: string,
+    @Param('taskId') taskId: string,
   ) {
     const { content, authorName } = body;
     const userId = req.user.sub;
     const response = await firstValueFrom(
       this.taskClient.send('comment.create', {
         userId,
-        taskId: id,
+        taskId,
         content,
         authorName,
       }),
     );
 
     if (!response) return { message: 'Não foi possível criar o comentário.' };
+
+    return response;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get(':taskId/comments')
+  async getComments(
+    @Query() pagination: PaginationDto,
+    @Param('taskId') taskId: string,
+  ) {
+    const response = await firstValueFrom(
+      this.taskClient.send('comment.read', {
+        taskId,
+        page: pagination.page,
+        size: pagination.size,
+      }),
+    );
+
+    if (!response) return { message: 'Nenhum comentário encontrada.' };
 
     return response;
   }

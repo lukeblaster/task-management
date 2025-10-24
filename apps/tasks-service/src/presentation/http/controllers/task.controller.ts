@@ -34,8 +34,6 @@ export class TaskController {
       id: param,
     });
 
-    console.log(tasks);
-
     if (!tasks) return { message: 'Nenhuma tarefa encontrada.' };
 
     return TaskPresenter.toHTTP(tasks);

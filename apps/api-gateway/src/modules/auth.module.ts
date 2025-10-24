@@ -5,7 +5,6 @@ import { AtAuthGuard } from 'src/domain/guards/at.guard';
 import { AtJwtStrategy } from 'src/domain/strategies/at.strategy';
 import { RtStrategy } from 'src/domain/strategies/rt.strategy';
 import { AuthController } from 'src/presentation/http/controllers/auth.controller';
-import { TestController } from 'src/presentation/http/controllers/test.controller';
 
 @Module({
   imports: [
@@ -22,7 +21,7 @@ import { TestController } from 'src/presentation/http/controllers/test.controlle
     ]),
     PassportModule,
   ],
-  controllers: [AuthController, TestController],
+  controllers: [AuthController],
   providers: [AtAuthGuard, AtJwtStrategy, RtStrategy],
 })
 export class AuthModule {}
