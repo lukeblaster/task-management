@@ -1,11 +1,12 @@
 import { getTasks } from "@/api/tasks/read-tasks";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
-export const useTasksData = () => {
+export const useTasksData = (page: number, size: number) => {
   return useQuery({
-    queryKey: ["tasks"],
-    queryFn: getTasks,
+    queryKey: ["tasks", page, size],
+    queryFn: () => getTasks(page, size),
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 };

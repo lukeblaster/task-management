@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { AddCircleIcon } from "@hugeicons/core-free-icons";
@@ -17,13 +17,27 @@ import { TaskTable } from "@/components/table/tasks-table";
 
 export const Route = createFileRoute("/app/tasks/")({
   component: RouteComponent,
+  validateSearch: (search) => ({
+    page: Number(search.page ?? 1),
+    size: Number(search.size ?? 10),
+  }),
 });
 
 function RouteComponent() {
-  const tasks: TaskProps[] = useTasksData().data?.data?.data;
-  console.log(tasks);
+  const { page, size } = useSearch({
+    from: "/app/tasks/",
+  });
+  const data: {
+    data: TaskProps[];
+    lastPage: number;
+    page: string;
+    total: number;
+  } = useTasksData(page, size).data?.data;
 
-  if (!tasks) return <div>Carregando...</div>;
+  if (!data) return <div>Carregando...</div>;
+
+  const { data: tasks, total } = data;
+
   return (
     <div className="flex flex-col">
       <div className="lg:px-1 lg:py-6">
@@ -49,12 +63,12 @@ function RouteComponent() {
             </DialogContent>
           </Dialog>
         </div>
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          {tasks?.map((task, index) => (
-            <TaskCard key={index + 1} task={task} />
-          ))}
-        </div> */}
-        <TaskTable data={tasks} />
+        <TaskTable
+          data={tasks}
+          rowCount={total}
+          pageCount={Number(page)}
+          size={size}
+        />
       </div>
     </div>
   );

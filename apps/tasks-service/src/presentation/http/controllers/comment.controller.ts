@@ -26,6 +26,7 @@ export class CommentController {
 
   @MessagePattern('comment.read')
   async readComments(@Payload() payload: ReadCommentsDto & PaginationDto) {
+    console.log(payload);
     const comments = await this.readCommentUseCase.execute({
       taskId: payload.taskId,
       page: payload.page,

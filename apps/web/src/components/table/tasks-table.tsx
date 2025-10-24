@@ -11,7 +11,6 @@ import {
   useReactTable,
   type ColumnDef,
   type ColumnFiltersState,
-  type FilterFn,
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table";
@@ -54,15 +53,29 @@ import {
   CommandList,
 } from "../ui/command";
 import { Checkbox } from "../ui/checkbox";
+import { useNavigate } from "@tanstack/react-router";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface TransactionTableProps {
   data: TaskProps[];
+  rowCount: number;
+  pageCount: number;
+  size: number;
   //   banks: BankAccount[];
   //   categories: Category[];
 }
 
 export function TaskTable({
   data,
+  rowCount,
+  pageCount,
+  size,
   //   banks,
   //   categories,
 }: TransactionTableProps) {
@@ -73,6 +86,9 @@ export function TaskTable({
   const [globalFilter, setGlobalFilter] = useState("");
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
+  const navigate = useNavigate({
+    from: "/app/tasks",
+  });
 
   const handleStatusCheckboxChange = (value: string) => {
     setSelectedStatuses((prev) => {
@@ -98,21 +114,6 @@ export function TaskTable({
     });
   };
 
-  // const multiStatusFilter: FilterFn<TaskProps> = (
-  //   row,
-  //   columnId,
-  //   filterValues
-  // ) => {
-  //   // se nenhum checkbox estiver marcado → mostra tudo
-  //   if (!filterValues || filterValues.length === 0) return true;
-  //   const rowValue = row.getValue<string>(columnId);
-
-  //   console.log(filterValues);
-  //   console.log(rowValue);
-  //   // Retorna true se algum dos valores selecionados estiver presente
-  //   return filterValues.some(rowValue);
-  // };
-
   const columns = getTasksColumns() as unknown as ColumnDef<TaskProps>[];
   //   const columns = getTransactionColumns(
   //     banks,
@@ -130,6 +131,8 @@ export function TaskTable({
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    manualPagination: true,
+    rowCount: rowCount,
     filterFns: {},
     state: {
       sorting,
@@ -137,9 +140,25 @@ export function TaskTable({
       columnVisibility,
       rowSelection,
       globalFilter,
+      pagination: {
+        pageIndex: pageCount - 1,
+        pageSize: size,
+      },
     },
     globalFilterFn: "includesString",
   });
+
+  const handlePageChange = (newPage: number) => {
+    navigate({
+      search: (prev) => ({ ...prev, page: newPage }),
+    });
+  };
+
+  const handleSizeChange = (newSize: number) => {
+    navigate({
+      search: (prev) => ({ ...prev, size: newSize, page: 1 }), // volta pra 1
+    });
+  };
 
   return (
     <div className="h-full">
@@ -353,11 +372,31 @@ export function TaskTable({
           {table.getFilteredSelectedRowModel().rows.length} de{" "}
           {table.getFilteredRowModel().rows.length} linha(s) selecionadas.
         </div> */}
+        <Select
+          defaultValue={`${size}`}
+          onValueChange={(e) => {
+            handleSizeChange(Number(e));
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Escolha um valor" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="30">30</SelectItem>
+            <SelectItem value="40">40</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="space-x-2">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              table.previousPage();
+              handlePageChange(pageCount - 1);
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             Anterior
@@ -365,7 +404,10 @@ export function TaskTable({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              table.nextPage();
+              handlePageChange(pageCount + 1);
+            }}
             disabled={!table.getCanNextPage()}
           >
             Próxima

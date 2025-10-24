@@ -26,7 +26,10 @@ export class TaskTypeOrmEntity {
   @Column()
   description: string;
 
-  @OneToMany(() => CommentTypeOrmEntity, (comment) => comment.task)
+  @OneToMany(() => CommentTypeOrmEntity, (comment) => comment.task, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   comments: CommentTypeOrmEntity[];
 
   @Column({ type: 'date' })

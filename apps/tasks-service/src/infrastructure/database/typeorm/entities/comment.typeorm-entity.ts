@@ -16,7 +16,9 @@ export class CommentTypeOrmEntity {
   @Column()
   content: string;
 
-  @ManyToOne(() => TaskTypeOrmEntity, (task) => task.comments)
+  @ManyToOne(() => TaskTypeOrmEntity, (task) => task.comments, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'task_id' })
   task: TaskTypeOrmEntity;
 
