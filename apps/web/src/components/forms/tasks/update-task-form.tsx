@@ -60,7 +60,7 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
   const mutation = useMutation({
     mutationFn: updateTask,
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ["tasks", task.id] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
       console.log(response);
     },
     onError: (response) => {

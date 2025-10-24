@@ -13,6 +13,7 @@ import { CreateCommentUseCase } from 'src/app/use-cases/comment/create-comment.u
 import { ReadCommentUseCase } from 'src/app/use-cases/comment/read-comment.use-case';
 import { ReadCommentsDto } from '../dto/comment/read-comment.dto';
 import { PaginationDto } from '../dto/pagination/pagination.dto';
+import { CommentPresenter } from '../presenters/comment.presenter';
 
 @Controller('comment')
 export class CommentController {
@@ -33,7 +34,13 @@ export class CommentController {
 
     if (!comments) return { message: 'Nenhum comentário encontrada.' };
 
-    return { comments };
+    const { data, lastPage, page, total } = comments;
+
+    const formattedComents = data.map((comment) =>
+      CommentPresenter.toHTTP(comment),
+    );
+
+    return { data: formattedComents, lastPage, page, total };
   }
 
   @MessagePattern('comment.create')
@@ -45,8 +52,6 @@ export class CommentController {
       taskId,
       authorId: userId,
     });
-
-    console.log(comment.task?.responsibles);
 
     comment.task?.responsibles?.forEach((element) => {
       this.notificationClient.emit('comment:new', {

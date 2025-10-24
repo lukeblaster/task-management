@@ -1,3 +1,4 @@
+import CreateCommentForm from "@/components/forms/comments/create-comment-form";
 import DeleteTaskForm from "@/components/forms/tasks/delete-task-form";
 import UpdateTaskForm from "@/components/forms/tasks/update-task-form";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { MessageCard } from "@/components/ui/message-card";
+import { CommentCard } from "@/components/ui/message-card";
+import { useCommentsData } from "@/hooks/use-comments";
 import { useTaskData } from "@/hooks/use-tasks-id";
+import type { CommentProps } from "@/types/Comment";
 import { type TaskProps } from "@/types/Task";
 import { ArrowLeft01Icon, Edit01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -25,6 +28,7 @@ function RouteComponent() {
     from: "/app/tasks/$taskId/",
   });
   const task: TaskProps = useTaskData(taskId).data?.data;
+  const comments: CommentProps[] = useCommentsData(taskId).data?.data.data;
 
   return (
     <div className="flex flex-col">
@@ -97,20 +101,15 @@ function RouteComponent() {
         </div>
         <div className="my-8 flex flex-col gap-2">
           <h2 className="font-semibold text-lg">Comentários</h2>
-          <div className="flex gap-2">
-            <input placeholder="Seu comentário..." className="input"></input>
+          <CreateCommentForm />
+          {/* <div className="flex gap-2">
+            <input placeholder="Seu comentário..." className="input" />
             <Button className="ml-auto">Enviar</Button>
-          </div>
+          </div> */}
           <div className="flex flex-col px-0.5 py-3 gap-3 max-h-[calc(30%-30px)] overflow-auto">
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
-            <MessageCard />
+            {comments?.map((comment, index) => (
+              <CommentCard key={comment.id} comment={comment} />
+            ))}
           </div>
         </div>
       </div>

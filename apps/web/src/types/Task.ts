@@ -5,13 +5,6 @@ export enum TaskPriority {
   URGENT = "URGENT",
 }
 
-export enum EnumStatus {
-  TODO = "TODO",
-  IN_PROGRESS = "IN_PROGRESS",
-  REVIEW = "REVIEW",
-  DONE = "DONE",
-}
-
 export const TaskPriorityMap = {
   LOW: "baixa",
   MEDIUM: "médio",
@@ -21,6 +14,13 @@ export const TaskPriorityMap = {
 
 export type TaskPriorityKey = keyof typeof TaskPriorityMap;
 export type TaskPriorityValue = (typeof TaskPriorityMap)[TaskPriorityKey];
+
+export enum EnumStatus {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  REVIEW = "REVIEW",
+  DONE = "DONE",
+}
 
 export const EnumStatusMap = {
   TODO: "pendente",
