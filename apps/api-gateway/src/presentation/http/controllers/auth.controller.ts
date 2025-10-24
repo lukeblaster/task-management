@@ -26,6 +26,14 @@ export class AuthController {
   ) {}
 
   @HttpCode(HttpStatus.OK)
+  @Get('list')
+  async listUsers() {
+    const response = await firstValueFrom(this.authClient.send('list', {}));
+
+    return response;
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(
     @Headers() credential: SignInDto,

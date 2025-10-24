@@ -21,6 +21,8 @@ import {
 } from "@/types/Task";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateTask } from "@/api/tasks/update-task";
+import type { UserProps } from "@/types/User";
+import { useUsersData } from "@/hooks/use-users";
 
 export const updateTaskSchema = z.object({
   id: z.uuid(),
@@ -39,6 +41,7 @@ export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
 const usersMock = ["1", "2", "3"];
 
 export default function UpdateTaskForm({ task }: { task: TaskProps }) {
+  const users: UserProps[] = useUsersData().data?.data;
   const {
     register,
     handleSubmit,
@@ -216,7 +219,7 @@ export default function UpdateTaskForm({ task }: { task: TaskProps }) {
               <FieldLabel>Responsáveis</FieldLabel>
               <ParticipantsPicker
                 inputValue={responsiblesValue}
-                users={usersMock ?? []}
+                users={users ?? []}
                 toggleId={toggleId}
               />
               {errors.responsibles && (

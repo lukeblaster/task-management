@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import type { TaskProps } from "@/types/Task";
+import type { UserProps } from "@/types/User";
 
 const user = {
   id: "dsjahd812h1",
@@ -30,7 +31,7 @@ export const updateUserSchema = z.object({
 
 type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
-export default function UpdateUserForm() {
+export default function UpdateUserForm({ user }: { user: UserProps }) {
   const {
     register,
     handleSubmit,

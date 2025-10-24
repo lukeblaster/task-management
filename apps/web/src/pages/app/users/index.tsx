@@ -1,6 +1,4 @@
-import CreateTaskForm from "@/components/forms/tasks/create-task-form";
 import CreateUserForm from "@/components/forms/users/create-user-form";
-import TaskCard from "@/components/task/task-card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +9,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import UsersCard from "@/components/users/users-card";
+import { useUsersData } from "@/hooks/use-users";
+import type { UserProps } from "@/types/User";
 import { AddCircleIcon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { createFileRoute } from "@tanstack/react-router";
@@ -20,12 +20,14 @@ export const Route = createFileRoute("/app/users/")({
 });
 
 function RouteComponent() {
+  const users: UserProps[] = useUsersData().data?.data;
+  console.log(users);
   return (
     <div className="flex flex-col">
       <div className="lg:px-1 lg:py-6">
         <div className="flex justify-between items-end mb-6">
           <h1 className="text-md lg:text-xl font-semibold px-0.5">
-            Suas usuários
+            Usuários do sistema
           </h1>
           <Dialog>
             <DialogTrigger asChild>
@@ -46,8 +48,8 @@ function RouteComponent() {
           </Dialog>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <UsersCard key={index + 1} />
+          {users?.map((user) => (
+            <UsersCard key={user?.id} user={user} />
           ))}
         </div>
       </div>

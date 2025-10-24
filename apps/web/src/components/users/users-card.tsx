@@ -12,13 +12,15 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
 import UpdateUserForm from "../forms/users/update-user-form";
+import type { UserProps } from "@/types/User";
 
-export default function UsersCard() {
+export default function UsersCard({ user }: { user: UserProps }) {
   return (
     <Dialog>
       <DialogTrigger>
@@ -28,8 +30,10 @@ export default function UsersCard() {
               <AvatarFallback>LS</AvatarFallback>
             </Avatar>
             <div>
-              <p>Lucas Soares</p>
-              <span className="text-muted-foreground text-sm">Usuário</span>
+              <p>{user?.username}</p>
+              <span className="text-muted-foreground text-sm">
+                {user?.email}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -37,8 +41,11 @@ export default function UsersCard() {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Dados do usuário</DialogTitle>
+          <DialogDescription>
+            Salve para alterar os dados do usuário
+          </DialogDescription>
         </DialogHeader>
-        <UpdateUserForm />
+        <UpdateUserForm user={user} />
       </DialogContent>
     </Dialog>
   );

@@ -3,10 +3,14 @@ import { CreateUserUseCase } from 'src/app/use-cases/users/create-user.use-case'
 import { CreateUserDto } from '../dtos/users/create-user.dto';
 import { UserPresenter } from '../presenters/user.presenter';
 import { MessagePattern } from '@nestjs/microservices';
+import { ReadUserUseCase } from 'src/app/use-cases/users/read-user.use-case';
 
 @Controller()
 export class UsersController {
-  constructor(private readonly createUserUseCase: CreateUserUseCase) {}
+  constructor(
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly readUserUseCase: ReadUserUseCase,
+  ) {}
 
   @MessagePattern('signup')
   async create(@Body() body: CreateUserDto) {
@@ -19,5 +23,14 @@ export class UsersController {
     });
 
     return UserPresenter.toHTTP(user);
+  }
+
+  @MessagePattern('list')
+  async readAllUsers() {
+    const users = await this.readUserUseCase.execute();
+
+    const formattedUsers = users?.map((user) => UserPresenter.toHTTP(user));
+
+    return formattedUsers;
   }
 }

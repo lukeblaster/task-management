@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTask } from "@/api/tasks/create-task";
+import { useUsersData } from "@/hooks/use-users";
+import type { UserProps } from "@/types/User";
 
 export const createTaskSchema = z.object({
   title: z
@@ -37,6 +39,7 @@ export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 const usersMock = ["1", "2", "3"];
 
 export default function CreateTaskForm() {
+  const users: UserProps[] = useUsersData().data?.data;
   const {
     register,
     handleSubmit,
@@ -65,8 +68,6 @@ export default function CreateTaskForm() {
   });
 
   const responsiblesValue = watch("responsibles");
-  const todo = watch("status");
-  console.log(todo);
 
   function toggleId(id: string) {
     const currentResponsibles = responsiblesValue || [];
@@ -216,7 +217,7 @@ export default function CreateTaskForm() {
               <FieldLabel>Responsáveis</FieldLabel>
               <ParticipantsPicker
                 inputValue={responsiblesValue}
-                users={usersMock}
+                users={users}
                 toggleId={toggleId}
               />
               {errors.responsibles && (

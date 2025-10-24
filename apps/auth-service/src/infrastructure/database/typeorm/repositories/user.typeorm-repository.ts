@@ -12,6 +12,16 @@ export class TypeOrmUserRepository implements UserRepository {
     private readonly typeOrmRepository: Repository<UserTypeOrmEntity>,
   ) {}
 
+  async findAllUsers(): Promise<User[] | null> {
+    const userEntities = await this.typeOrmRepository.find();
+    if (!userEntities) {
+      return null;
+    }
+    const users = userEntities.map((user) => this.toDomain(user));
+
+    return users;
+  }
+
   async findById(id: string): Promise<User | null> {
     const userEntity = await this.typeOrmRepository.findOne({ where: { id } });
     if (!userEntity) {

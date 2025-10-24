@@ -17,9 +17,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import type { UserProps } from "@/types/User";
 
 interface ParticipantsPickerProps {
-  users: string[];
+  users: UserProps[];
   inputValue: string[];
   toggleId: (id: string) => void;
 }
@@ -38,15 +39,15 @@ export function ParticipantsPicker({
           {inputValue?.length > 0 ? (
             <div className="flex flex-wrap gap-1">
               {inputValue?.map((userId) => {
-                const user = users.find((u) => u === userId);
+                const user = users.find((u) => u.id === userId);
                 if (!user) return null;
 
                 return (
-                  <Badge key={user} variant="secondary">
-                    {user}
+                  <Badge key={user.id} variant="secondary">
+                    {user.username}
                     <X
                       className="ml-1 h-3 w-3 cursor-pointer"
-                      onClick={() => toggleId(user)}
+                      onClick={() => toggleId(user.id)}
                     />
                   </Badge>
                 );
@@ -66,17 +67,20 @@ export function ParticipantsPicker({
 
               <CommandGroup>
                 {users.map((user) => {
-                  const selected = inputValue?.includes(user);
+                  const selected = inputValue?.includes(user.id);
 
                   return (
-                    <CommandItem key={user} onSelect={() => toggleId(user)}>
+                    <CommandItem
+                      key={user.id}
+                      onSelect={() => toggleId(user.id)}
+                    >
                       <Check
                         className={cn(
                           "mr-2 h-4 w-4",
                           selected ? "opacity-100" : "opacity-0"
                         )}
                       />
-                      {user}
+                      {user.username}
                     </CommandItem>
                   );
                 })}
