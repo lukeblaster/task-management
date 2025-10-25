@@ -6,7 +6,6 @@ import { AppController } from './app.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { UserTypeOrmEntity } from './infrastructure/database/typeorm/entities/user.typeorm-entity';
 import { AuthModule } from './modules/auth.module';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,8 +23,8 @@ import { AuthModule } from './modules/auth.module';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         schema: 'auth',
+        synchronize: false,
         entities: [__dirname + '/**/*.typeorm-entity{.ts,.js}'],
-        synchronize: true,
       }),
     }),
     UserModule,

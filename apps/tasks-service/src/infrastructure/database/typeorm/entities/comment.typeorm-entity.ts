@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { TaskTypeOrmEntity } from './task.typeorm-entity';
 
-@Entity('comment')
+@Entity({ name: 'comment', schema: 'tasks' })
 export class CommentTypeOrmEntity {
   @PrimaryColumn('uuid')
   id: string;

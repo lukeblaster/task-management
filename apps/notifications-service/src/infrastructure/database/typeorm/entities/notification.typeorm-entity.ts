@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity('notification')
+@Entity({ name: 'notification', schema: 'notifications' })
 export class NotificationTypeOrmEntity {
   @PrimaryColumn('uuid')
   id: string;

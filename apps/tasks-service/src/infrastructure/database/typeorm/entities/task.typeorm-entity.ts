@@ -16,7 +16,7 @@ enum EnumStatus {
   DONE = 'DONE',
 }
 
-@Entity('tasks')
+@Entity({ name: 'tasks', schema: 'tasks' })
 export class TaskTypeOrmEntity {
   @PrimaryColumn()
   id: string;

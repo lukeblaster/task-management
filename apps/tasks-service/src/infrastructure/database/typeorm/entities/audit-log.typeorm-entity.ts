@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { TaskTypeOrmEntity } from './task.typeorm-entity';
 
-@Entity('audit_log')
+@Entity({ name: 'audit_log', schema: 'tasks' })
 export class AuditLogOrmEntity {
   @PrimaryColumn()
   id: string;
