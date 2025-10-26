@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Frontend React Application
@@ -9,14 +9,14 @@ services:
       dockerfile: ./apps/web/Dockerfile
       target: development
     ports:
-      - '3000:3000'
+      - "3000:3000"
     volumes:
       - .:/app
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/web/node_modules
     env_file:
-      - .env.production
+      - .env
     networks:
       - challenge-network
 
@@ -28,14 +28,14 @@ services:
       dockerfile: ./apps/api-gateway/Dockerfile
       target: development
     ports:
-      - '3001:3001'
+      - "3001:3001"
     volumes:
       - .:/app
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/api-gateway/node_modules
     env_file:
-      - .env.production
+      - .env
     depends_on:
       db:
         condition: service_started
@@ -52,14 +52,14 @@ services:
       dockerfile: ./apps/auth-service/Dockerfile
       target: development
     ports:
-      - '3002:3002'
+      - "3002:3002"
     volumes:
       - .:/app
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/auth-service/node_modules
     env_file:
-      - .env.production
+      - .env
     depends_on:
       db:
         condition: service_started
@@ -76,14 +76,14 @@ services:
       dockerfile: ./apps/tasks-service/Dockerfile
       target: development
     ports:
-      - '3003:3003'
+      - "3003:3003"
     volumes:
       - .:/app
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/tasks-service/node_modules
     env_file:
-      - .env.production
+      - .env
     depends_on:
       db:
         condition: service_started
@@ -100,14 +100,14 @@ services:
       dockerfile: ./apps/notifications-service/Dockerfile
       target: development
     ports:
-      - '3004:3004'
+      - "3004:3004"
     volumes:
       - .:/app
       - ./packages:/app/packages
       - /app/node_modules
       - /app/apps/notifications-service/node_modules
     env_file:
-      - .env.production
+      - .env
     depends_on:
       db:
         condition: service_started
@@ -122,7 +122,7 @@ services:
     container_name: db
     attach: false
     ports:
-      - '5432:5432'
+      - "5432:5432"
     networks:
       - challenge-network
     restart: always
@@ -140,14 +140,14 @@ services:
     attach: false
     restart: always
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - challenge-network
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
-    volumes: ['rabbitmq_data:/var/lib/rabbitmq']
+    volumes: ["rabbitmq_data:/var/lib/rabbitmq"]
 
 volumes:
   postgres_data:
