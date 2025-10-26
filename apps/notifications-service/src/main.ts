@@ -9,20 +9,19 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.RMQ,
     options: {
-      urls: ['amqp://admin:admin@localhost:5672'],
+      urls: [`${process.env.RABBITMQ_URL!}`],
       queue: 'notifications_queue',
-      queueOptions: { durable: false },
     },
   });
 
   app.use(cookieParser.default());
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: `${process.env.FRONTEND_URL!}`,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
   await app.startAllMicroservices();
-  await app.listen(3005);
+  await app.listen(3004);
 
   Logger.log(
     '🔔 Notifications microservice is listening on RabbitMQ queue: notifications_queue',

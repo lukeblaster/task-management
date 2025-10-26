@@ -33,15 +33,18 @@ import { NotificationsGateway } from './presentation/websocket/gateway/notificat
       }),
     }),
     TypeOrmModule.forFeature([NotificationTypeOrmEntity]),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://admin:admin@localhost:5672'],
-          queue: 'auth_queue',
-          queueOptions: { durable: false },
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>('RABBITMQ_URL') as string],
+            queue: 'auth_queue',
+          },
+        }),
       },
     ]),
   ],

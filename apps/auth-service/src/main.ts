@@ -5,18 +5,16 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
-    AppModule,
-    {
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://admin:admin@localhost:5672'],
-        queue: 'auth_queue',
-        queueOptions: { durable: false },
-      },
+  const app = await NestFactory.create(AppModule);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`${process.env.RABBITMQ_URL!}`],
+      queue: 'auth_queue',
     },
-  );
-  await app.listen();
+  });
+  await app.startAllMicroservices();
+  await app.listen(3002);
   Logger.log('🔐 Auth microservice is listening on RabbitMQ queue: auth_queue');
 }
 bootstrap();

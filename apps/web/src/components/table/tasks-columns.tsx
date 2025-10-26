@@ -156,6 +156,10 @@ export function getTasksColumns(): ColumnDef<TaskProps>[] {
         return (
           <Link
             to="/app/tasks/$taskId"
+            search={{
+              page: 1,
+              size: 10,
+            }}
             params={{
               taskId: taskId as unknown as string,
             }}

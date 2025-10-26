@@ -1,4 +1,3 @@
-# /monorepo/apps/web/Dockerfile
 FROM node:20-slim AS development
 
 WORKDIR /app
@@ -18,4 +17,4 @@ RUN npm install
 EXPOSE 3001
 
 # O comando será sobrescrito pelo docker-compose
-CMD ["npm", "run", "start:dev", "--workspace=apps/api-gateway"]
+CMD ["npm", "run", "dev", "--workspace=apps/api-gateway"]

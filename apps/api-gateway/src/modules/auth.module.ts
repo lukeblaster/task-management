@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { PassportModule } from '@nestjs/passport';
 import { AtAuthGuard } from 'src/domain/guards/at.guard';
@@ -8,15 +9,22 @@ import { AuthController } from 'src/presentation/http/controllers/auth.controlle
 
 @Module({
   imports: [
-    ClientsModule.register([
+    ConfigModule.forRoot({
+      isGlobal: true, // garante acesso ao ConfigService em qualquer lugar
+      envFilePath: '.env',
+    }),
+    ClientsModule.registerAsync([
       {
         name: 'AUTH_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://admin:admin@localhost:5672'],
-          queue: 'auth_queue',
-          queueOptions: { durable: false },
-        },
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>('RABBITMQ_URL') as string],
+            queue: 'auth_queue',
+          },
+        }),
       },
     ]),
     PassportModule,

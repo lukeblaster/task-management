@@ -11,7 +11,7 @@ export const SocketGateway = () => {
   });
 
   useEffect(() => {
-    const socket = io("ws://localhost:3005", {
+    const socket = io(`${import.meta.env.VITE_WEBSOCKET_URL!}`, {
       withCredentials: true,
     });
 

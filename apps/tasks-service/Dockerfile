@@ -9,18 +9,18 @@ COPY package.json package-lock.json turbo.json ./
 COPY packages/ ./packages/
 
 # Copia a aplicação web
-COPY apps/auth-service/ ./apps/auth-service/
+COPY apps/tasks-service/ ./apps/tasks-service/
 
 # Instala dependências
 RUN npm install
 
-EXPOSE 3002
+EXPOSE 3003
 
 # Copia o script wait-for-it
 COPY wait-for-it.sh /wait-for-it.sh
 RUN chmod +x /wait-for-it.sh
 
-WORKDIR /app/apps/auth-service
+WORKDIR /app/apps/tasks-service
 
 # Comando padrão: espera o banco, roda migrations e inicia o dev server
 CMD ["/bin/sh", "-c", "\

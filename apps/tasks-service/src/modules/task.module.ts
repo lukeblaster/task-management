@@ -1,33 +1,37 @@
-import { Module } from '@nestjs/common';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CreateAuditLogUseCase } from 'src/app/use-cases/audit-log/create-audit-log.use-case';
-import { ReadAuditLogUseCase } from 'src/app/use-cases/audit-log/read-comment.use-case';
-import { CreateTaskUseCase } from 'src/app/use-cases/task/create-tasks.use-case';
-import { DeleteTaskUseCase } from 'src/app/use-cases/task/delete-tasks.use-case';
-import { ReadTaskUseCase } from 'src/app/use-cases/task/read-task.use-case';
-import { ReadTasksUseCase } from 'src/app/use-cases/task/read-tasks.use-case';
-import { UpdateTaskUseCase } from 'src/app/use-cases/task/update-tasks.use-case';
-import { AuditLogRepository } from 'src/domain/repositories/audit-log.repository';
-import { TaskRepository } from 'src/domain/repositories/task.repository';
-import { AuditLogOrmEntity } from 'src/infrastructure/database/typeorm/entities/audit-log.typeorm-entity';
-import { TaskTypeOrmEntity } from 'src/infrastructure/database/typeorm/entities/task.typeorm-entity';
-import { TypeOrmAuditLogRepository } from 'src/infrastructure/database/typeorm/repositories/audit-log.typeorm-repository';
-import { TypeOrmTaskRepository } from 'src/infrastructure/database/typeorm/repositories/task.typeorm-repository';
-import { TaskController } from 'src/presentation/http/controllers/task.controller';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ClientsModule, Transport } from "@nestjs/microservices";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { CreateAuditLogUseCase } from "src/app/use-cases/audit-log/create-audit-log.use-case";
+import { ReadAuditLogUseCase } from "src/app/use-cases/audit-log/read-comment.use-case";
+import { CreateTaskUseCase } from "src/app/use-cases/task/create-tasks.use-case";
+import { DeleteTaskUseCase } from "src/app/use-cases/task/delete-tasks.use-case";
+import { ReadTaskUseCase } from "src/app/use-cases/task/read-task.use-case";
+import { ReadTasksUseCase } from "src/app/use-cases/task/read-tasks.use-case";
+import { UpdateTaskUseCase } from "src/app/use-cases/task/update-tasks.use-case";
+import { AuditLogRepository } from "src/domain/repositories/audit-log.repository";
+import { TaskRepository } from "src/domain/repositories/task.repository";
+import { AuditLogOrmEntity } from "src/infrastructure/database/typeorm/entities/audit-log.typeorm-entity";
+import { TaskTypeOrmEntity } from "src/infrastructure/database/typeorm/entities/task.typeorm-entity";
+import { TypeOrmAuditLogRepository } from "src/infrastructure/database/typeorm/repositories/audit-log.typeorm-repository";
+import { TypeOrmTaskRepository } from "src/infrastructure/database/typeorm/repositories/task.typeorm-repository";
+import { TaskController } from "src/presentation/http/controllers/task.controller";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([TaskTypeOrmEntity, AuditLogOrmEntity]),
-    ClientsModule.register([
+    ClientsModule.registerAsync([
       {
-        name: 'NOTIFICATION_SERVICE',
-        transport: Transport.RMQ,
-        options: {
-          urls: ['amqp://admin:admin@localhost:5672'],
-          queue: 'notifications_queue',
-          queueOptions: { durable: false },
-        },
+        name: "NOTIFICATION_SERVICE",
+        imports: [ConfigModule],
+        inject: [ConfigService],
+        useFactory: async (configService: ConfigService) => ({
+          transport: Transport.RMQ,
+          options: {
+            urls: [configService.get<string>("RABBITMQ_URL") as string],
+            queue: "notifications_queue",
+          },
+        }),
       },
     ]),
   ],

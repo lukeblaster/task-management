@@ -1,13 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { DateTimeIcon } from "@hugeicons/core-free-icons";
-import { Link } from "@tanstack/react-router";
+import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import {
   Dialog,
