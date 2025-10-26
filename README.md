@@ -1,6 +1,6 @@
-# `Turborepo` Vite starter
+# Desafio Full-stack Júnior — Sistema de Gestão de Tarefas Colaborativo
 
-This is a community-maintained example. If you experience a problem, please submit a pull request with a fix. GitHub Issues will be closed.
+Este é um projeto criado para o processo seletivo da vaga Full-stack Júnior na Jungle Gaming.
 
 ## Using this example
 
