@@ -19,6 +19,13 @@ import { useState } from "react";
 
 export const Route = createFileRoute("/app/users/")({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "Usuários | Taskly",
+      },
+    ],
+  }),
 });
 
 function RouteComponent() {

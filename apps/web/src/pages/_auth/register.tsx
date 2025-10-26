@@ -22,6 +22,13 @@ import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 
 export const Route = createFileRoute("/_auth/register")({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "Registro | Taskly",
+      },
+    ],
+  }),
 });
 
 const RegisterSchema = z

@@ -23,6 +23,14 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_auth/login")({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "Login | Taskly",
+      },
+      { name: "description", content: "Gerencie suas tarefas com facilidade." },
+    ],
+  }),
 });
 
 export const LoginSchema = z.object({

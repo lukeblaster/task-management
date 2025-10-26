@@ -1,21 +1,14 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
+  HeadContent,
   Outlet,
   createRootRouteWithContext,
-  // useRouterState,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-// import { Spinner } from '../components/Spinner'
 import { QueryClient } from "@tanstack/react-query";
 import { SocketGateway } from "@/websocket";
 import { Toaster } from "@/components/ui/sonner";
-// import type { Auth } from "../utils/auth";
-
-// function RouterSpinner() {
-//   const isLoading = useRouterState({ select: (s) => s.status === "pending" });
-//   return <div className={`${isLoading ? "" : "hidden"}`}>Carregando</div>;
-// }
+import { NotFound } from "./-not_found.index";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,21 +19,20 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const Route = createRootRouteWithContext<{
-  //   auth: Auth;
-  //   queryClient: QueryClient
-}>()({
+export const Route = createRootRouteWithContext<{}>()({
   component: RootComponent,
+  notFoundComponent: NotFound,
 });
 
 export default function RootComponent() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
+        <HeadContent />
         <SocketGateway />
-        <Outlet />
         <TanStackRouterDevtools position="bottom-right" />
         <Toaster expand />
+        <Outlet />
       </QueryClientProvider>
     </>
   );

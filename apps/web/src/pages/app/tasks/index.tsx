@@ -7,6 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/app/tasks/")({
   component: RouteComponent,
+  head: () => ({
+    meta: [
+      {
+        title: "Minhas tarefas | Taskly",
+      },
+    ],
+  }),
   validateSearch: (search) => ({
     page: Number(search.page ?? 1),
     size: Number(search.size ?? 10),
