@@ -8,6 +8,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser.default());
 
+  app.setGlobalPrefix('api');
+
   const config = new DocumentBuilder()
     .setTitle('Taskly')
     .setDescription('The Taskly API documentation')
@@ -15,7 +17,7 @@ async function bootstrap() {
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, documentFactory);
+  SwaggerModule.setup('docs', app, documentFactory);
 
   app.enableCors({
     origin: process.env.FRONTEND_URL!,
