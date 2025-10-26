@@ -2,13 +2,13 @@
 
 Este projeto foi desenvolvido como parte do processo seletivo para a vaga de Full-Stack Júnior na Jungle Gaming.
 
-## Arquitetura
+## 🏗 Arquitetura
 
 <img width="1160" height="676" alt="diagram-export-26-10-2025-10_58_45" src="https://github.com/user-attachments/assets/415f35d5-4114-483d-95e6-982854a7940b" />
 
 O sistema utiliza um front-end em React com Vite e um back-end baseado em microsserviços NestJS, comunicando-se através de filas via RabbitMQ.
 
-### Front-end
+### 🧭 Front-end
 
 O front-end foi construído com:
 
@@ -17,7 +17,7 @@ O front-end foi construído com:
 - Zod + React Hook Form para validação de formulários.
 - Socket.io para comunicação em tempo real.
 
-### Back-end
+### 🛠️ Back-end
 
 O back-end é composto por:
 
@@ -27,7 +27,7 @@ O back-end é composto por:
 
 O uso de módulos e decorators do NestJS acelerou o desenvolvimento e manteve a arquitetura limpa e organizada.
 
-### Banco de Dados, Docker, Turborepo
+### 🐳 Banco de Dados, Docker, Turborepo
 
 - Monorepo com Turborepo, integrando front-end, API Gateway e microsserviços.
 - PostgreSQL gerenciado pelo TypeORM.
@@ -37,7 +37,7 @@ Para simplificar, todos os microsserviços compartilham o mesmo banco, mas utili
 
 As migrations são gerenciadas de forma centralizada, com arquivos database.config.ts. Cada microsserviço possui uma migration inicial manual para criar o schema, e as demais são geradas automaticamente.
 
-## Decisões técnicas
+## 💻 Decisões técnicas
 
 Por se tratar de um ambiente onde todos os componentes da arquitetura estarão dentro do mesmo container, optei por trabalhar com apenas um banco de dados via schemas diferentes. Em cada microsserviço que faz consultas ao banco, temos uma configuração dentro do `app.module.ts` para acessar o schema correto e cada arquivo de entidade especifica o nome da tabela e qual schema ela deve usar.
 
@@ -45,14 +45,14 @@ Para gerar as migrações, temos arquivos `database.config.ts` que implementa as
 
 Na autenticação usei uma estratégia que acho interessante onde os tokens de autenticação são retornados via cookies de resposta e armezados com a flag `httpOnly` e `secure`, se protegendo de ataques XSS. Com isso, eliminamos a necessidade de enviar o token no cabeçalho de cada requisição, precisamos apenas do credentials definido como `true` no front e no back da aplicação.
 
-## Problemas conhecidos e melhorias
+## 🔨 Problemas conhecidos e melhorias
 
 Eu já havia criado um projeto que utiliza NestJS, TypeORM e PostgreSQL. Isso me economizou um certo tempo para estabelecer a arquitetura do back-end que é composta por uma arquitetura limpa com a aplicação de casos de uso e injeção de dependências.
 
 Como melhoria, criaria fluxos de CI/CD com testes unitários e builds automatizados e logs mais precisos para cada microsserviço. Outro ponto a ser trabalhado é a criação de um Dockerfile que se integre ao ambiente de desenvolvimento e ao de produção também.
 
 
-## Tempo gasto
+## 🕒 Tempo gasto
 
 O maior tempo gasto foi em configurações de ambiente como o monorepo com turborepo, migrations do TypeORM e Docker. O tempo investido em pesquisas foi grande mas valoroso.
 
@@ -68,7 +68,7 @@ Monorepo com Turborepo - 2 horas
 
 Estas são apenas algumas estimativas do tempo gasto.
 
-## Instruções
+## 📝 Instruções
 
 Para rodar este projeto, clone o repositório e em seguida:
 
